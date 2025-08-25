@@ -5,8 +5,11 @@ import {cn} from "@/app/cn";
 
 import styles from "./NavBar.module.css"
 
-export default function Navbar() {
-    const [isExpanded, setIsExpanded] = useState(false);
+type NavBarProps = {
+    isExpanded: boolean;
+    setIsExpanded: (expanded: boolean) => void;
+}
+export default function Navbar({ isExpanded, setIsExpanded }: NavBarProps) {
     const [isMobile, setIsMobile] = useState(false);
 
     useEffect(() => {
@@ -36,7 +39,7 @@ export default function Navbar() {
         {
             icon: ClipboardCheck,
             title: "Registrar entrada",
-            href: "/tasks"
+            href: "/check-in"
         },
         {
             icon: FileText,
