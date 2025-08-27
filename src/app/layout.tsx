@@ -4,6 +4,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import NavBar from "@/app/components/NavBar";
 import React, {useState} from "react";
+import {cn} from "@/app/cn";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -24,20 +25,11 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiasing`}
       >
         <NavBar isExpanded={isExpanded} setIsExpanded={setIsExpanded}/>
         <main
-            className={`
-            min-h-screen
-            transition-all
-            duration-300
-            pt-4
-            px-4
-            md:pt-6
-            md:px-6
-            ${isExpanded ? 'md:ml-[280px]' : 'md:ml-[80px]'}
-          `}
+            className={cn("min-h-screen transition-all duration-300", isExpanded ? 'ml-[280px]' : 'ml-[80px]')}
         >
             {children}
         </main>
