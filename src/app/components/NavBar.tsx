@@ -9,7 +9,7 @@ type NavBarProps = {
     isExpanded: boolean;
     setIsExpanded: (expanded: boolean) => void;
 }
-export default function Navbar({ isExpanded, setIsExpanded }: NavBarProps) {
+export default function Navbar({isExpanded, setIsExpanded}: NavBarProps) {
     const [isMobile, setIsMobile] = useState(false);
 
     useEffect(() => {
@@ -47,37 +47,56 @@ export default function Navbar({ isExpanded, setIsExpanded }: NavBarProps) {
             href: "/settings"
         },
         {
-            icon: Wrench ,
+            icon: Wrench,
             title: "Ordenes de trabajo",
             href: "/logout"
         }
     ];
 
     return (
-        <>
-            {isMobile && !isExpanded &&(
-                <button
-                    onClick={() => setIsExpanded(!isExpanded)}
-                    className={cn(
-                        styles.mobileToggle,
-                        "fixed top-4 left-4 z-[60] bg-gradient-to-r from-[#bdc3c7] to-[#2c3e50] rounded-lg p-3",
-                        "flex items-center justify-center shadow-lg",
-                        "hover:from-[#2c3e50] hover:to-[#bdc3c7] transition-all duration-200",
-                        "hover:scale-105 active:scale-95 md:hidden"
+        <div className="relative">
+            <div
+                className={cn(
+                    "fixed top-0 w-full h-16 bg-gradient-to-r from-slate-900/95 via-slate-800/90 to-slate-900/95 backdrop-blur-lg border-b border-white/10 z-[50]",
+                    "transition-all duration-300 ease-in-out",
+                    isMobile ? "left-0" : (
+                        isExpanded
+                            ? "left-[280px] w-[calc(100%-280px)] md:left-[240px] md:w-[calc(100%-240px)] lg:left-[280px] lg:w-[calc(100%-280px)]"
+                            : "left-[70px] w-[calc(100%-70px)] md:left-[70px] md:w-[calc(100%-70px)] lg:left-[80px] lg:w-[calc(100%-80px)]"
+                    )
+                )}
+            >
+                <div className="flex items-center justify-between h-full px-4">
+                    {isMobile && !isExpanded && (
+                        <button
+                            onClick={() => setIsExpanded(!isExpanded)}
+                            className={cn(
+                                "bg-gradient-to-r from-[#bdc3c7] to-[#2c3e50] rounded-lg p-3 z-[60]",
+                                "flex items-center justify-center shadow-lg",
+                                "hover:from-[#2c3e50] hover:to-[#bdc3c7] transition-all duration-200",
+                                "hover:scale-105 active:scale-95 md:hidden"
+                            )}
+                        >
+                            <div className="flex flex-col space-y-1">
+                                <div className="w-5 h-0.5 bg-white rounded-full transition-all"></div>
+                                <div className="w-5 h-0.5 bg-white rounded-full transition-all"></div>
+                                <div className="w-5 h-0.5 bg-white rounded-full transition-all"></div>
+                            </div>
+                        </button>
                     )}
-                >
+                    <div className="flex-1 flex justify-center">
+                        <h1 className="text-white font-semibold text-lg text-center">
+                            Taller mecánico UFSM
+                        </h1>
+                    </div>
 
-                        <div className="flex flex-col space-y-1">
-                            <div className="w-5 h-0.5 bg-white rounded-full transition-all"></div>
-                            <div className="w-5 h-0.5 bg-white rounded-full transition-all"></div>
-                            <div className="w-5 h-0.5 bg-white rounded-full transition-all"></div>
-                        </div>
-                </button>
-            )}
+                    {isMobile && !isExpanded && <div className="w-[60px]"></div>}
+                </div>
+            </div>
 
             {isMobile && isExpanded && (
                 <div
-                    className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+                    className="fixed inset-0 z-40 md:hidden"
                     onClick={() => setIsExpanded(false)}
                 />
             )}
@@ -140,7 +159,7 @@ export default function Navbar({ isExpanded, setIsExpanded }: NavBarProps) {
                     </div>
                 </div>
             </aside>
-        </>
+        </div>
     )
 }
 
@@ -193,11 +212,13 @@ function SidebarOption({
                 )}
 
                 {isActive && (
-                    <div className="absolute right-2 w-2 h-2 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full" />
+                    <div
+                        className="absolute right-2 w-2 h-2 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full"/>
                 )}
 
                 {!isExpanded && (
-                    <div className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-sm rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
+                    <div
+                        className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-sm rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
                         {title}
                     </div>
                 )}
