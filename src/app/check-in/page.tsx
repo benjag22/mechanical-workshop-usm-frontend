@@ -1,15 +1,18 @@
 'use client'
+
 import {cn} from "@/app/cn";
-import {useState} from "react";
+import {ReactNode, useState} from "react";
+import ClientInfoDetailComponent from "@/app/check-in/components/ClientInfoDetailComponent";
 
 type Section = {
     index: number;
     name: string;
+    children?: ReactNode;
 }
 
 export default function CheckInPage() {
     const sections: Section[] = [
-        {index: 0, name: "Client information"},
+        {index: 0, name: "Client information", children: <ClientInfoDetailComponent />},
         {index: 1, name: "Car"},
         {index: 2, name: "Car detail"},
         {index: 3, name: "Car condition"}
@@ -132,15 +135,8 @@ export default function CheckInPage() {
             </div>
 
             <div className={cn("flex-1 bg-slate-700/20 mx-6 my-6 rounded-lg")}>
-                <div className={cn("p-8 h-full flex items-center justify-center")}>
-                    <div className={cn("text-center")}>
-                        <h2 className={cn("text-white text-xl mb-2 font-medium")}>
-                            {sections[nSections].name}
-                        </h2>
-                        <p className={cn("text-slate-400 text-sm")}>
-                            Contenido de la sección aparecerá aquí
-                        </p>
-                    </div>
+                <div className={cn("h-full flex flex-col p-6")}>
+                    {sections[nSections].children}
                 </div>
             </div>
 
