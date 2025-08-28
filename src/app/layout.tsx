@@ -29,7 +29,7 @@ export default function RootLayout({
         >
         <NavBar isExpanded={isExpanded} setIsExpanded={setIsExpanded}/>
         <main
-            className={cn("min-h-screen", isExpanded ? 'ml-[280px]' : 'ml-[80px]')}
+            className={cn("min-h-screen", isExpanded ? 'ml-[240px] lg:ml-[280px]' : 'ml-[70px] lg:ml-[80px]')}
         >
             {children}
         </main>
