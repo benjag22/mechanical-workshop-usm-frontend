@@ -55,7 +55,7 @@ export default function SelectConditionComponent({name, onStateChange, onInclude
     };
 
     const getItemStyles = (state: ConditionState, index: number) => {
-        const baseStyles = "flex-1 cursor-pointer p-3 h-12 flex items-center justify-center border-2 transition-all duration-200 ease-in-out font-medium text-xs lg:text-sm";
+        const baseStyles = "flex-1 cursor-pointer p-3 h-12 flex items-center justify-center border-2 transition-all duration-300 ease-in-out font-medium text-xs lg:text-sm";
 
         const positionStyles = cn(
             index === 0 ? "border-l-2" : "border-l-0"
@@ -67,9 +67,7 @@ export default function SelectConditionComponent({name, onStateChange, onInclude
             ? "scale-105 shadow-lg ring-2 ring-black z-10"
             : "hover:scale-102 hover:shadow-md";
 
-        const disabledStyles = !isIncluded ? "opacity-50" : "";
-
-        return cn(baseStyles, positionStyles, stateStyles, selectedStyles, disabledStyles);
+        return cn(baseStyles, positionStyles, stateStyles, selectedStyles);
     };
 
     return (
@@ -78,8 +76,8 @@ export default function SelectConditionComponent({name, onStateChange, onInclude
                 onClick={handleIncludeToggle}
                 className={cn(
                     "w-full flex items-center space-x-4 p-3 border-1 transition-all duration-200 cursor-pointer group",
-                    "rounded-t-lg border-gray-400 bg-gray-700 hover:bg-gray-600 hover:border-gray-300",
-                    isIncluded ? "border-gray-300 bg-gray-600" : ""
+                    "border-gray-400 bg-gray-700 hover:bg-gray-600 hover:border-gray-300",
+                    isIncluded ? "border-gray-300 bg-gray-600 rounded-t-lg" : "rounded-lg "
                 )}
             >
                 <div className="relative">
@@ -87,7 +85,8 @@ export default function SelectConditionComponent({name, onStateChange, onInclude
                         type="checkbox"
                         id={`checkbox-${name}`}
                         checked={isIncluded}
-                        onChange={() => {}}
+                        onChange={() => {
+                        }}
                         className="sr-only"
                     />
                     <div
@@ -124,18 +123,20 @@ export default function SelectConditionComponent({name, onStateChange, onInclude
             </div>
 
             <div className={cn(
-                "w-full border-x-2 border-b-1 border-gray-200 rounded-b-lg overflow-hidden transition-all duration-200",
-                isIncluded ? "border-blue-400" : ""
+                "w-full border-x-2 border-gray-200 rounded-b-lg overflow-hidden transition-all duration-200"
             )}>
-                <div className="flex w-full">
+                {isIncluded && (<div className="flex w-full">
                     {CONDITIONS.map((state, index) => (
                         <button
                             key={state}
                             type="button"
-                            className={getItemStyles(state, index)}
+                            className={cn(getItemStyles(state, index),
+                                selectedState === state ? "appearance-none" : ""
+                            )}
                             onClick={(e) => {
                                 e.stopPropagation();
                                 handleStateSelect(state);
+
                             }}
                             disabled={!isIncluded}
                             aria-pressed={selectedState === state}
@@ -148,7 +149,7 @@ export default function SelectConditionComponent({name, onStateChange, onInclude
                             )}
                         </button>
                     ))}
-                </div>
+                </div>)}
             </div>
         </div>
     );
