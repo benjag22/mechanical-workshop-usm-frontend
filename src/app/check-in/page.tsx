@@ -3,7 +3,8 @@
 import {cn} from "@/app/cn";
 import {ReactNode, useState} from "react";
 import ClientInfoDetailComponent from "@/app/check-in/components/ClientInfoDetailComponent";
-
+import PatentListComponent from "@/app/check-in/components/PatentListComponent";
+import ListOfConditionsComponent from "@/app/check-in/components/ListOfConditionsComponent";
 type Section = {
     index: number;
     name: string;
@@ -13,9 +14,9 @@ type Section = {
 export default function CheckInPage() {
     const sections: Section[] = [
         {index: 0, name: "Client information", children: <ClientInfoDetailComponent />},
-        {index: 1, name: "Car"},
-        {index: 2, name: "Car detail"},
-        {index: 3, name: "Car condition"}
+        {index: 1, name: "Car detail", children: <PatentListComponent />},
+        {index: 2, name: "Car condition", children: <ListOfConditionsComponent />},
+        {index: 3, name: "Tools"}
     ]
 
     const [nSections, setNSections] = useState<number>(0);
@@ -90,10 +91,6 @@ export default function CheckInPage() {
     return (
         <div className={cn("flex flex-col bg-slate-800 w-full h-screen")}>
             <div className={cn("flex flex-col px-8 py-6 bg-slate-700/30")}>
-                <h1 className={cn("text-white text-xl font-medium mb-6 text-center")}>
-                    {sections[nSections].name}
-                </h1>
-
                 <div className={cn("flex items-center justify-center space-x-3")}>
                     {sections.map((s, index) => (
                         <div key={s.index} className={cn("flex items-center")}>
@@ -134,8 +131,8 @@ export default function CheckInPage() {
                 </div>
             </div>
 
-            <div className={cn("flex-1 bg-slate-700/20 mx-6 my-6 rounded-lg")}>
-                <div className={cn("h-full flex flex-col p-6")}>
+            <div className={cn("flex-1 bg-slate-700/20 m-3 rounded-lg overflow-hidden")}>
+                <div className={cn("h-full flex flex-col p-4 overflow-y-auto")}>
                     {sections[nSections].children}
                 </div>
             </div>
