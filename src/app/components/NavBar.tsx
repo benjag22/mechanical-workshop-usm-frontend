@@ -57,12 +57,12 @@ export default function Navbar({isExpanded, setIsExpanded}: NavBarProps) {
         <div className="relative">
             <div
                 className={cn(
-                    "fixed top-0 w-full h-16 bg-gradient-to-r from-slate-900/95 via-slate-800/90 to-slate-900/95 backdrop-blur-lg border-b border-white/10 z-[50]",
-                    "transition-all duration-300 ease-in-out",
-                    isMobile ? "left-0" : (
+                    "top-0 w-full h-16 bg-gradient-to-r from-slate-900/95 via-slate-800/90 to-slate-900/95 backdrop-blur-lg border-b border-white/10 z-[50]",
+                    "transition-all  duration-300 ease-in-out",
+                    isMobile ? "m-0" : (
                         isExpanded
-                            ? "left-[280px] w-[calc(100%-280px)] md:left-[240px] md:w-[calc(100%-240px)] lg:left-[280px] lg:w-[calc(100%-280px)]"
-                            : "left-[70px] w-[calc(100%-70px)] md:left-[70px] md:w-[calc(100%-70px)] lg:left-[80px] lg:w-[calc(100%-80px)]"
+                            ? "ml-[240px] md:ml-[240px] lg:ml-[280px]"
+                            : "ml-[70px] md:ml-[70px] lg:ml-[80px]"
                     )
                 )}
             >
