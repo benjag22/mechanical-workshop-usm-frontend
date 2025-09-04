@@ -1,16 +1,16 @@
 import {cn} from "@/app/cn";
 import {Check} from "lucide-react";
 import {useState} from "react";
+import {ConditionState} from "@/app/check-in/components/ListOfConditionsComponent";
 
 type Props = {
     name: string;
-    onStateChange?: (state: string | null) => void;
-    onIncludeChange?: (included: boolean) => void;
+    onStateChange: (newState: ConditionState | null, name:string) => void;
 }
 
-type ConditionState = "Rayado" | "Abollado" | "Trizado" | "Malo" | "Roto" | "Ausente";
+type State = "Rayado" | "Abollado" | "Trizado" | "Malo" | "Roto" | "Ausente";
 
-const CONDITIONS: ConditionState[] = [
+const CONDITIONS: State[] = [
     "Rayado",
     "Abollado",
     "Trizado",
@@ -19,7 +19,7 @@ const CONDITIONS: ConditionState[] = [
     "Ausente"
 ];
 
-const CONDITION_STYLES: Record<ConditionState, string> = {
+const CONDITION_STYLES: Record<State, string> = {
     "Rayado": "bg-emerald-400 text-black border-emerald-600 hover:bg-emerald-500",
     "Abollado": "bg-lime-300 text-black border-lime-500 hover:bg-lime-400",
     "Trizado": "bg-yellow-300 text-black border-yellow-500 hover:bg-yellow-400",
@@ -28,33 +28,29 @@ const CONDITION_STYLES: Record<ConditionState, string> = {
     "Ausente": "bg-red-600 text-white border-red-800 hover:bg-red-700"
 };
 
-export default function SelectConditionComponent({name, onStateChange, onIncludeChange}: Props) {
-    const [selectedState, setSelectedState] = useState<ConditionState | null>(null);
+export default function SelectConditionComponent({name, onStateChange}: Props) {
+    const [selectedState, setSelectedState] = useState<State | null>(null);
     const [isIncluded, setIsIncluded] = useState<boolean>(false);
 
-    const handleStateSelect = (state: ConditionState) => {
+    const handleStateSelect = (state: State) => {
         // Auto-enable the component if not already enabled
         if (!isIncluded) {
             setIsIncluded(true);
-            onIncludeChange?.(true);
         }
-
-        const newState = selectedState === state ? null : state;
-        setSelectedState(newState);
-        onStateChange?.(newState);
+        setSelectedState(state);
+        onStateChange({name:name, state:state }, name);
     };
 
     const handleIncludeToggle = () => {
         const newIncluded = !isIncluded;
         setIsIncluded(newIncluded);
-        onIncludeChange?.(newIncluded);
         if (!newIncluded) {
             setSelectedState(null);
-            onStateChange?.(null);
+            onStateChange(null, name);
         }
     };
 
-    const getItemStyles = (state: ConditionState, index: number) => {
+    const getItemStyles = (state: State, index: number) => {
         const baseStyles = "flex-1 cursor-pointer p-3 h-12 flex items-center justify-center border-2 transition-all duration-300 ease-in-out font-medium text-xs lg:text-sm";
 
         const positionStyles = cn(
@@ -71,7 +67,7 @@ export default function SelectConditionComponent({name, onStateChange, onInclude
     };
 
     return (
-        <div className="flex flex-col w-full lg:w-1/2">
+        <div className="flex flex-col w-full">
             <div
                 onClick={handleIncludeToggle}
                 className={cn(
