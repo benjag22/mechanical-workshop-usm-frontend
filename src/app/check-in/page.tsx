@@ -5,10 +5,11 @@ import {ReactNode, useState} from "react";
 import ClientInfoDetailComponent from "@/app/check-in/components/ClientInfoDetailComponent";
 import PatentListComponent from "@/app/check-in/components/PatentListComponent";
 import ListOfConditionsComponent from "@/app/check-in/components/ListOfConditionsComponent";
+import SelectToolsComponent from "@/app/check-in/components/SelectToolsComponent";
 type Section = {
     index: number;
     name: string;
-    children?: ReactNode;
+    children: ReactNode;
 }
 
 export default function CheckInPage() {
@@ -16,7 +17,7 @@ export default function CheckInPage() {
         {index: 0, name: "Client information", children: <ClientInfoDetailComponent />},
         {index: 1, name: "Car detail", children: <PatentListComponent />},
         {index: 2, name: "Car condition", children: <ListOfConditionsComponent />},
-        {index: 3, name: "Tools"}
+        {index: 3, name: "Tools", children: <SelectToolsComponent />}
     ]
 
     const [nSections, setNSections] = useState<number>(0);
