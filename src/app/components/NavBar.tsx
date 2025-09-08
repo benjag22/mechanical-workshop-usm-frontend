@@ -49,7 +49,7 @@ export default function Navbar({isExpanded, setIsExpanded}: NavBarProps) {
         {
             icon: Wrench,
             title: "Ordenes de trabajo",
-            href: "/logout"
+            href: "/work-orders"
         }
     ];
 
@@ -57,9 +57,8 @@ export default function Navbar({isExpanded, setIsExpanded}: NavBarProps) {
         <div className="relative">
             <div
                 className={cn(
-                    "top-0 w-full h-16 bg-gradient-to-r from-slate-900/95 via-slate-800/90 to-slate-900/95 backdrop-blur-lg border-b border-white/10 z-[50]",
-                    "transition-all  duration-300 ease-in-out",
-                    isMobile ? "m-0" : (
+                    isMobile ? "m-0 top-0 w-full h-16 bg-gradient-to-r from-slate-900/95 via-slate-800/90 to-slate-900/95 backdrop-blur-lg border-b border-white/10 z-[50]\",\n" +
+                        "                    \"transition-all  duration-300 ease-in-out" : (
                         isExpanded
                             ? "ml-[240px] md:ml-[240px] lg:ml-[280px]"
                             : "ml-[70px] md:ml-[70px] lg:ml-[80px]"
@@ -84,11 +83,14 @@ export default function Navbar({isExpanded, setIsExpanded}: NavBarProps) {
                             </div>
                         </button>
                     )}
-                    <div className="flex-1 flex justify-center">
-                        <h1 className="text-white font-semibold text-lg text-center">
-                            Taller mecánico UFSM
-                        </h1>
-                    </div>
+                    {isMobile && (
+
+                        <div className="flex-1 flex justify-center">
+                            <h1 className="text-white font-semibold text-lg text-center">
+                                Taller mecánico UFSM
+                            </h1>
+                        </div>
+                    )}
 
                     {isMobile && !isExpanded && <div className="w-[60px]"></div>}
                 </div>
