@@ -1,37 +1,39 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+    --background: #ffffff;
+    --foreground: #171717;
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+    :root {
+        --background: #0a0a0a;
+        --foreground: #ededed;
+    }
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    overflow-x: hidden;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  margin: 0;
-  padding: 0;
-}
-
-main {
-  width: 100%;
-  min-height: 100vh;
-  transition: margin-left 0.3s ease-in-out;
+    background: var(--background);
+    color: var(--foreground);
 }
 
 @media (max-width: 767px) {
-  main {
-    margin-left: 0;
-  }
-}
+    .grid {
+        display: block !important;
+    }
 
-#root {
-  margin: 0;
-  box-sizing: border-box;
+    main {
+        margin-left: 0 !important;
+    }
 }
