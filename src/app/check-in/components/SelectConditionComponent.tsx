@@ -51,7 +51,7 @@ export default function SelectConditionComponent({name, onStateChange}: Props) {
     };
 
     const getItemStyles = (state: State, index: number) => {
-        const baseStyles = "flex-1 cursor-pointer p-3 h-12 flex items-center justify-center border-2 transition-all duration-300 ease-in-out font-medium text-xs lg:text-sm";
+        const baseStyles = "flex-1 cursor-pointer p-1 lg:p-2 md:p-3 h-12 flex items-center justify-center border-2 transition-all duration-300 ease-in-out font-medium text-xs lg:text-sm";
 
         const positionStyles = cn(
             index === 0 ? "border-l-2" : "border-l-0"
