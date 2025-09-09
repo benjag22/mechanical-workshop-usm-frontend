@@ -29,10 +29,10 @@ export default function RootLayout({
             className={`${geistSans.variable} ${geistMono.variable} antialiasing`}
         >
         <div className={cn(
-            "min-h-screen grid transition-all duration-300",
+            "min-h-screen block md:grid transition-all duration-300",
             isExpanded
                 ? "grid-cols-[240px_1fr] lg:grid-cols-[280px_1fr]"
-                : "grid-cols-[70px_1fr] lg:grid-cols-[80px_1fr]"
+                : "grid-cols-[70px_1fr] lg:grid-cols-[80px_1fr] "
         )}>
             <NavBar isExpanded={isExpanded} setIsExpanded={setIsExpanded}/>
             <main className={cn("min-h-screen overflow-x-hidden")}>
