@@ -1,12 +1,12 @@
 import {cn} from "@/app/cn";
 import {CheckIn} from "@/app/work-orders/page";
+import Link from "next/link";
 
 type CheckInToOrderContainerProps = {
     checkIn: CheckIn;
-    onGenerateOrder: (checkInId: number) => void;
 }
 
-export default function CheckInToOrderContainer({ checkIn, onGenerateOrder }: CheckInToOrderContainerProps) {
+export default function CheckInToOrderContainer({ checkIn }: CheckInToOrderContainerProps) {
     const { carAssociated, clientAssociated, reason, observations, conditions } = checkIn;
 
     return (
@@ -67,17 +67,19 @@ export default function CheckInToOrderContainer({ checkIn, onGenerateOrder }: Ch
             </div>
 
             <div className={cn("flex items-center lg:ml-6 mt-4 lg:mt-0")}>
-                <button
-                    onClick={() => onGenerateOrder(checkIn.id)}
+                <Link
+                    href={`work-orders/generate/${checkIn.id}`}
                     className={cn(
-                        "w-full lg:w-auto px-6 py-3 bg-blue-600 hover:bg-blue-700",
+                        "w-full h-full flex items-center justify-center lg:w-auto px-6 py-3 bg-blue-600 hover:bg-blue-700",
                         "text-white font-medium rounded-lg transition-colors duration-200",
                         "focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2",
                         "focus:ring-offset-slate-600 shadow-md hover:shadow-lg"
                     )}
                 >
-                    Generar orden
-                </button>
+                    <p>
+                        Generar orden de trabajo
+                    </p>
+                </Link>
             </div>
         </div>
     );
