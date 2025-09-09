@@ -155,10 +155,6 @@ const checkIns: CheckIn[] = [
     },
 ];
 export default function WorkOrdersPage() {
-    const handleGenerateOrder = (checkInId: number) => {
-        console.log(`Generando orden para Check In ID: ${checkInId}`);
-    };
-
     return (
         <div className={cn("w-full bg-slate-700 min-h-screen p-6")}>
             <FilterSection />
@@ -177,7 +173,6 @@ export default function WorkOrdersPage() {
                         <CheckInToOrderContainer
                             key={checkIn.id}
                             checkIn={checkIn}
-                            onGenerateOrder={handleGenerateOrder}
                         />
                     ))
                 ) : (
