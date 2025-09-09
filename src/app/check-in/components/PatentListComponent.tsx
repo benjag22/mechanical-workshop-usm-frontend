@@ -100,21 +100,21 @@ export default function PatentListComponent(){
                         className={cn(
                             "w-full pl-10 lg:pl-12 pr-4 py-2 lg:py-3 bg-gray-800/50 border border-gray-700/50 rounded-lg",
                             "text-white placeholder-gray-500 backdrop-blur-sm text-sm lg:text-base",
-                            "focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50",
+                            "focus:outline-none focus:ring-blue-500/50 focus:border-blue-500/50",
                             "transition-all duration-200 hover:border-gray-600/50"
                         )}
                     />
                 </div>
 
-                <div className="flex-1 min-h-0 overflow-y-auto">
+                <div className="p-2 flex-1 min-h-0 overflow-y-auto">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 lg:gap-4 auto-rows-max">
                         <button
                             onClick={handleNewCar}
                             className={cn(
-                                "flex items-center justify-center p-3 lg:p-4 bg-blue-600/20 hover:bg-blue-600/30",
+                                "flex w-full items-center justify-center p-3 lg:p-4 bg-blue-600/20 hover:bg-blue-600/30",
                                 "border-2 border-dashed border-blue-500/50 hover:border-blue-400/70 rounded-lg",
                                 "text-blue-300 hover:text-blue-200 transition-all duration-200",
-                                "backdrop-blur-sm hover:scale-[1.01]",
+                                "backdrop-blur-sm hover:scale-[1.001]",
                                 "min-h-[60px] lg:min-h-[72px]"
                             )}
                         >
@@ -129,9 +129,9 @@ export default function PatentListComponent(){
                                     key={patent.code}
                                     onClick={() => handlePatentSelect(patent.code)}
                                     className={cn(
-                                        "flex items-center p-3 lg:p-4 bg-gray-800/50 hover:bg-gray-700/50",
+                                        "flex w-full items-center p-3 lg:p-4 bg-gray-800/50 hover:bg-gray-700/50",
                                         "border border-gray-700/50 hover:border-gray-600/50 rounded-lg",
-                                        "text-white transition-all duration-200 backdrop-blur-sm hover:scale-[1.01]",
+                                        "text-white transition-all duration-200 backdrop-blur-sm hover:scale-[1.001]",
                                         "focus:outline-none focus:ring-2 focus:ring-blue-500/50",
                                         "min-h-[60px] lg:min-h-[72px]"
                                     )}
