@@ -3,6 +3,7 @@ import {ReactNode, use, useState} from 'react'
 import {cn} from "@/app/cn"
 import DrawableCanvas from "@/app/components/DrawableCanvas"
 import ImageGallery, {ImageFile} from "@/app/components/ImageGallery"
+import SelectServices from "@/app/work-orders/components/SelectServices";
 
 type Section = {
     index: number
@@ -26,7 +27,7 @@ export default function GenerateByIdCheckIn({params}: { params: Promise<Generate
 
     const sections: Section[] = [
         {index: 0, name: "General Information"},
-        {index: 1, name: "Services"},
+        {index: 1, name: "Services", children: <SelectServices />},
         {
             index: 2,
             name: "Car condition",
@@ -128,32 +129,15 @@ export default function GenerateByIdCheckIn({params}: { params: Promise<Generate
                     </div>
 
                     <div className="text-center">
-                        <h2 className="text-slate-100 text-xl font-semibold mb-1">
-                            {sections[nSections].name}
-                        </h2>
                         <p className="text-slate-300 text-sm">
                             Paso {nSections + 1} de {sections.length}
                         </p>
                     </div>
                 </div>
 
-                <div className="bg-slate-400 rounded-2xl p-8 shadow-2xl border border-slate-200">
+                <div className="bg-gradient-to-br from-slate-800 via-slate-700 to-slate-500 rounded-2xl p-8 shadow-2xl border border-slate-900">
                     <div className="min-h-[400px] flex items-center justify-center mb-4">
-                        {sections[nSections].children || (
-                            <div className="text-center">
-                                <div
-                                    className="w-24 h-24 bg-slate-200 rounded-full flex items-center justify-center mx-auto mb-4">
-                                    <svg className="w-12 h-12 text-slate-400" fill="none" stroke="currentColor"
-                                         viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                                              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                                    </svg>
-                                </div>
-                                <h3 className="text-slate-600 text-lg font-medium mb-2">
-                                    {sections[nSections].name}
-                                </h3>
-                            </div>
-                        )}
+                        {sections[nSections].children || (<></>)}
                     </div>
 
                     <div className="flex justify-center gap-4">
