@@ -2,6 +2,7 @@
 import {ReactNode, use, useState} from 'react'
 import {cn} from "@/app/cn"
 import DrawableCanvas from "@/app/components/DrawableCanvas"
+import ImageGallery, {ImageFile} from "@/app/components/ImageGallery"
 
 type Section = {
     index: number
@@ -15,9 +16,13 @@ type GenerateByIdCheckInPageProps = {
 
 export default function GenerateByIdCheckIn({params}: { params: Promise<GenerateByIdCheckInPageProps> }) {
     const {id} = use(params)
-    const [drawingData, setDrawingData] = useState<string>('')
     const [nSections, setNSections] = useState<number>(0)
-    const vehicleImageUrl = "/bg-conditions.jpg"
+    const [carImages, setCarImages] = useState<ImageFile[]>([])
+
+    const handleImagesChange = (images: ImageFile[]) => {
+        setCarImages(images)
+        console.log('Imágenes del coche actualizadas:')
+    }
 
     const sections: Section[] = [
         {index: 0, name: "General Information"},
@@ -26,14 +31,11 @@ export default function GenerateByIdCheckIn({params}: { params: Promise<Generate
             index: 2,
             name: "Car condition",
             children: (
-                <DrawableCanvas
-                    backgroundImage={vehicleImageUrl}
-                    width={900}
-                    height={650}
-                    strokeColor="red"
-                    strokeWidth={3}
-                    onDrawingChange={setDrawingData}
-                    className="mb-6"
+                <ImageGallery
+                    onImagesChange={handleImagesChange}
+                    maxImages={15}
+                    maxFileSize={10}
+                    acceptedFormats={['image/jpeg', 'image/png', 'image/webp']}
                 />
             )
         },
