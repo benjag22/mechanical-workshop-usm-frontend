@@ -185,7 +185,7 @@ export default function ImageGallery({
                     </div>
 
                     <div>
-                        <p className="text-lg font-medium text-slate-700 mb-2">
+                        <p className="text-lg font-medium text-slate-300 mb-2">
                             Arrastra imágenes aquí o selecciona archivos
                         </p>
                         <p className="text-sm text-slate-500 mb-4">
