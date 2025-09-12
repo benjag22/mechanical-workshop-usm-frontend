@@ -57,7 +57,7 @@ const lights: Light[] = [
     {name: "Filtro de partículas / emisiones (diésel)", icon: DPF},
 ];
 
-interface IndicatorLightsProps {
+type IndicatorLightsProps = {
     lightsData: LightData[];
     onLightChange: (index: number, field: 'present' | 'functioning', value: boolean) => void;
 }
@@ -66,7 +66,6 @@ export default function IndicatorLights({lightsData, onLightChange}: IndicatorLi
 
     const handlePresentChange = (index: number, present: boolean) => {
         onLightChange(index, 'present', present);
-        // Si no está presente, también marcar como no funcionando
         if (!present) {
             onLightChange(index, 'functioning', false);
         }
@@ -76,7 +75,6 @@ export default function IndicatorLights({lightsData, onLightChange}: IndicatorLi
         <div className="space-y-4 pr-4">
             {lightsData.map((light, index) => (
                 <div key={light.name} className="bg-slate-700/50 rounded-xl p-6 border border-slate-600/30">
-                    {/* Header con icono y nombre */}
                     <div className="flex items-center gap-4 mb-6">
                         {light.icon && (
                             <div className="flex-shrink-0">
@@ -94,7 +92,6 @@ export default function IndicatorLights({lightsData, onLightChange}: IndicatorLi
                         </span>
                     </div>
 
-                    {/* Selector de presencia */}
                     <div className="mb-4">
                         <p className="text-slate-300 text-sm mb-3">¿Está presente?</p>
                         <div className="flex gap-3">
@@ -123,7 +120,6 @@ export default function IndicatorLights({lightsData, onLightChange}: IndicatorLi
                         </div>
                     </div>
 
-                    {/* Selector de funcionamiento - solo si está presente */}
                     {light.status.present && (
                         <div>
                             <p className="text-slate-300 text-sm mb-3">¿Funciona correctamente?</p>
@@ -154,7 +150,6 @@ export default function IndicatorLights({lightsData, onLightChange}: IndicatorLi
                         </div>
                     )}
 
-                    {/* Indicador de no evaluado */}
                     {!light.status.present && (
                         <div className="flex items-center gap-2 mt-4">
                             <div className="w-2 h-2 bg-slate-400 rounded-full"></div>
@@ -167,5 +162,4 @@ export default function IndicatorLights({lightsData, onLightChange}: IndicatorLi
     );
 }
 
-// Exportar luces para uso en otros componentes
 export {lights};

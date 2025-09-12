@@ -9,7 +9,7 @@ export default function SummaryIndicatorLights() {
             ...light,
             status: {
                 present: false,
-                functioning: false,
+                functioning: true,
                 evaluated: false
             }
         }))
@@ -35,12 +35,10 @@ export default function SummaryIndicatorLights() {
         present: lightsData.filter(light => light.status.present).length,
         functioning: lightsData.filter(light => light.status.present && light.status.functioning).length,
         notFunctioning: lightsData.filter(light => light.status.present && !light.status.functioning).length,
-        notPresent: lightsData.filter(light => !light.status.present && light.status.evaluated).length,
-        notEvaluated: lightsData.filter(light => !light.status.evaluated).length
     };
 
     return (
-        <div className="min-h-screen w-full bg-slate-800">
+        <div className="min-h-screen w-full bg-slate-800 rounded-md">
             <div className="max-w-7xl mx-auto p-6">
                 <div className="mb-8">
                     <h1 className="text-3xl font-bold text-slate-100 mb-2">
@@ -88,31 +86,6 @@ export default function SummaryIndicatorLights() {
                                         <span className="text-slate-300">Con fallas:</span>
                                         <span className="text-red-400 font-semibold">{stats.notFunctioning}</span>
                                     </div>
-
-                                    <div className="flex justify-between items-center py-2">
-                                        <span className="text-slate-300">No presentes:</span>
-                                        <span className="text-amber-400 font-semibold">{stats.notPresent}</span>
-                                    </div>
-
-                                    <div className="flex justify-between items-center py-2 border-t border-slate-600/30 pt-4">
-                                        <span className="text-slate-300">Sin evaluar:</span>
-                                        <span className="text-slate-400 font-semibold">{stats.notEvaluated}</span>
-                                    </div>
-                                </div>
-
-                                <div className="mt-6">
-                                    <div className="flex justify-between text-sm text-slate-300 mb-2">
-                                        <span>Progreso</span>
-                                        <span>{Math.round(((stats.total - stats.notEvaluated) / stats.total) * 100)}%</span>
-                                    </div>
-                                    <div className="w-full bg-slate-600 rounded-full h-2">
-                                        <div
-                                            className="bg-blue-500 h-2 rounded-full transition-all duration-300"
-                                            style={{
-                                                width: `${((stats.total - stats.notEvaluated) / stats.total) * 100}%`
-                                            }}
-                                        ></div>
-                                    </div>
                                 </div>
 
                                 <div className="mt-6 space-y-2">
@@ -123,14 +96,6 @@ export default function SummaryIndicatorLights() {
                                     <div className="flex items-center gap-2">
                                         <div className="w-3 h-3 bg-red-500 rounded-full"></div>
                                         <span className="text-sm text-slate-300">Con fallas</span>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <div className="w-3 h-3 bg-amber-500 rounded-full"></div>
-                                        <span className="text-sm text-slate-300">No presente</span>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <div className="w-3 h-3 bg-slate-400 rounded-full"></div>
-                                        <span className="text-sm text-slate-300">Sin evaluar</span>
                                     </div>
                                 </div>
                             </div>
