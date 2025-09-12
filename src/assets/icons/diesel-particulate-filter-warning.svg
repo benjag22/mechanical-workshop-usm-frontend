@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" data-name="Слой 1" viewBox="0 0 100 125" x="0px" y="0px">
+    <defs>
+        <style>.cls-1{fill:#020202;}</style>
+    </defs>
+    <title>DIESEL-particulate-filter-warning</title>
+    <path class="cls-1"
+          d="M98.75,46.19a24.15,24.15,0,0,0-12.1-3.25H77.22V31.62a2.5,2.5,0,0,0-2.5-2.5h-60a2.5,2.5,0,0,0-2.5,2.5V42.94H2.5a2.5,2.5,0,0,0,0,5h9.75v4.12H2.5a2.5,2.5,0,0,0,0,5h9.75V68.38a2.5,2.5,0,0,0,2.5,2.5h60a2.5,2.5,0,0,0,2.5-2.5V57.06h9.43A9.92,9.92,0,0,1,93,59.3a2.5,2.5,0,0,0,3.15-3.88,15.07,15.07,0,0,0-9.48-3.36H77.22V47.94h9.43a19.14,19.14,0,0,1,9.6,2.57,2.5,2.5,0,0,0,2.51-4.33ZM72.22,65.88h-55V34.12h55Z"/>
+    <circle class="cls-1" cx="25.87" cy="42.95" r="2.5"/>
+    <circle class="cls-1" cx="25.87" cy="57.12" r="2.5"/>
+    <circle class="cls-1" cx="38.21" cy="42.95" r="2.5"/>
+    <circle class="cls-1" cx="38.21" cy="57.12" r="2.5"/>
+    <circle class="cls-1" cx="50.54" cy="42.95" r="2.5"/>
+    <circle class="cls-1" cx="50.54" cy="57.12" r="2.5"/>
+    <circle class="cls-1" cx="62.87" cy="42.95" r="2.5"/>
+    <circle class="cls-1" cx="62.87" cy="57.12" r="2.5"/>
+    <circle class="cls-1" cx="32.4" cy="50" r="2.5"/>
+    <circle class="cls-1" cx="44.74" cy="50" r="2.5"/>
+    <circle class="cls-1" cx="57.07" cy="50" r="2.5"/>
+</svg>
