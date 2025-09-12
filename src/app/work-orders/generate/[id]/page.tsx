@@ -4,7 +4,7 @@ import {cn} from "@/app/cn"
 import DrawableCanvas from "@/app/components/DrawableCanvas"
 import ImageGallery, {ImageFile} from "@/app/components/ImageGallery"
 import SelectServices from "@/app/work-orders/components/SelectServices";
-
+import SummaryIndicatorLights from "@/app/work-orders/components/SummaryIndicatorLights";
 type Section = {
     index: number
     name: string
@@ -26,10 +26,11 @@ export default function GenerateByIdCheckIn({params}: { params: Promise<Generate
     }
 
     const sections: Section[] = [
-        {index: 0, name: "General Information"},
-        {index: 1, name: "Services", children: <SelectServices />},
+        {index: 0, name: "General Information", children: <SummaryIndicatorLights />},
+        {index: 1, name: "Lights Indicators", children: <SummaryIndicatorLights />},
+        {index: 2, name: "Services", children: <SelectServices />},
         {
-            index: 2,
+            index: 3,
             name: "Car condition",
             children: (
                 <ImageGallery
@@ -41,7 +42,7 @@ export default function GenerateByIdCheckIn({params}: { params: Promise<Generate
             )
         },
         {
-            index: 3,
+            index: 4,
             name: "Client Signature",
             children: <DrawableCanvas width={1000} height={600} strokeColor="black"/>
         }
