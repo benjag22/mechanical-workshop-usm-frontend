@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import IndicatorLights, { lights, LightData } from "@/app/work-orders/components/IndicatorLights";
+import IndicatorLights, { lights, LightData } from "@/app/pending-check-in/components/IndicatorLights";
 
 export default function SummaryIndicatorLights() {
     const [lightsData, setLightsData] = useState<LightData[]>(() =>

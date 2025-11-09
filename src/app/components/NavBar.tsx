@@ -1,6 +1,6 @@
 "use client"
 import {useState, useEffect} from "react";
-import {LucideIcon, ChevronRight, ChevronLeft, User, ClipboardCheck, FileText, Wrench, Home, X} from "lucide-react";
+import {LucideIcon, ChevronRight, ChevronLeft, User, ClipboardCheck, Wrench, Home, X, ClipboardClock} from "lucide-react";
 import {cn} from "@/app/cn";
 
 import styles from "./NavBar.module.css"
@@ -42,9 +42,9 @@ export default function Navbar({isExpanded, setIsExpanded}: NavBarProps) {
             href: "/check-in"
         },
         {
-            icon: FileText,
-            title: "Lista de registros",
-            href: "/settings"
+            icon: ClipboardClock,
+            title: "Entradas pendientes",
+            href: "/pending-check-in"
         },
         {
             icon: Wrench,

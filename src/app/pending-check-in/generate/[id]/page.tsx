@@ -3,26 +3,22 @@ import {ReactNode, use, useState} from 'react'
 import {cn} from "@/app/cn"
 import DrawableCanvas from "@/app/components/DrawableCanvas"
 import ImageGallery, {ImageFile} from "@/app/components/ImageGallery"
-import SelectServices from "@/app/work-orders/components/SelectServices";
-import SummaryIndicatorLights from "@/app/work-orders/components/SummaryIndicatorLights";
+import SelectServices from "@/app/pending-check-in/components/SelectServices";
+import SummaryIndicatorLights from "@/app/pending-check-in/components/SummaryIndicatorLights";
+
 type Section = {
     index: number
     name: string
     children?: ReactNode
 }
 
-type GenerateByIdCheckInPageProps = {
-    id: number
-}
-
-export default function GenerateByIdCheckIn({params}: { params: Promise<GenerateByIdCheckInPageProps> }) {
+export default function GenerateByIdCheckIn({params}: { params: Promise<{ id: number }> }) {
     const {id} = use(params)
     const [nSections, setNSections] = useState<number>(0)
     const [carImages, setCarImages] = useState<ImageFile[]>([])
 
     const handleImagesChange = (images: ImageFile[]) => {
         setCarImages(images)
-        console.log('Imágenes del coche actualizadas:')
     }
 
     const sections: Section[] = [

@@ -1,5 +1,5 @@
 import {cn} from "@/app/cn";
-import {CheckIn} from "@/app/work-orders/page";
+import {CheckIn} from "@/app/pending-check-in/page";
 import Link from "next/link";
 
 type CheckInToOrderContainerProps = {
@@ -68,7 +68,7 @@ export default function CheckInToOrderContainer({ checkIn }: CheckInToOrderConta
 
             <div className={cn("flex items-center lg:ml-6 mt-4 lg:mt-0")}>
                 <Link
-                    href={`work-orders/generate/${checkIn.id}`}
+                    href={`pending-check-in/generate/${checkIn.id}`}
                     className={cn(
                         "w-full h-full flex items-center justify-center lg:w-auto px-6 py-3 bg-blue-600 hover:bg-blue-700",
                         "text-white font-medium rounded-lg transition-colors duration-200",
