@@ -2,7 +2,7 @@
 
 import type { Client, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
-import type { CreateCarData, CreateCarModelData, CreateCarModelResponses, CreateCarResponses, CreateClientData, CreateClientResponses, CreateMechanic1Data, CreateMechanic1Responses, CreateMechanicalConditionData, CreateMechanicalConditionResponses, CreateMechanicData, CreateMechanicResponses, CreateRecordData, CreateRecordResponses, CreateToolData, CreateToolResponses, GetAllCarBrandsData, GetAllCarBrandsResponses, GetAllCarModelsData, GetAllCarModelsResponses, GetAllCarsData, GetAllCarsResponses, GetAllClientsData, GetAllClientsResponses, GetAllMechanicsData, GetAllMechanicsResponses, GetAllRecordsData, GetAllRecordsResponses, GetAllToolsData, GetAllToolsResponses, GetCarFullData, GetCarFullResponses, GetCarModelData, GetCarModelResponses } from './types.gen';
+import type { CreateCarData, CreateCarModelData, CreateCarModelResponses, CreateCarResponses, CreateCheckInData, CreateCheckInResponses, CreateClientData, CreateClientResponses, CreateMechanic1Data, CreateMechanic1Responses, CreateMechanicalConditionData, CreateMechanicalConditionResponses, CreateMechanicData, CreateMechanicResponses, CreateRecordData, CreateRecordResponses, CreateToolData, CreateToolResponses, GetAllCarBrandsData, GetAllCarBrandsResponses, GetAllCarModelsData, GetAllCarModelsResponses, GetAllCarsData, GetAllCarsResponses, GetAllCheckInsData, GetAllCheckInsResponses, GetAllClientsData, GetAllClientsResponses, GetAllMechanicsData, GetAllMechanicsResponses, GetAllRecordsData, GetAllRecordsResponses, GetAllToolsData, GetAllToolsResponses, GetCarFullData, GetCarFullResponses, GetCarModelData, GetCarModelResponses, GetElectricalConditionsData, GetElectricalConditionsResponses, GetExteriorConditionsData, GetExteriorConditionsResponses, GetInteriorConditionsData, GetInteriorConditionsResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
@@ -101,6 +101,24 @@ export const createClient = <ThrowOnError extends boolean = false>(options: Opti
     });
 };
 
+export const getAllCheckIns = <ThrowOnError extends boolean = false>(options?: Options<GetAllCheckInsData, ThrowOnError>) => {
+    return (options?.client ?? client).get<GetAllCheckInsResponses, unknown, ThrowOnError>({
+        url: '/api/checkin',
+        ...options
+    });
+};
+
+export const createCheckIn = <ThrowOnError extends boolean = false>(options: Options<CreateCheckInData, ThrowOnError>) => {
+    return (options.client ?? client).post<CreateCheckInResponses, unknown, ThrowOnError>({
+        url: '/api/checkin',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
+
 export const getAllCars = <ThrowOnError extends boolean = false>(options?: Options<GetAllCarsData, ThrowOnError>) => {
     return (options?.client ?? client).get<GetAllCarsResponses, unknown, ThrowOnError>({
         url: '/api/car',
@@ -152,6 +170,27 @@ export const createMechanic1 = <ThrowOnError extends boolean = false>(options: O
             'Content-Type': 'application/json',
             ...options.headers
         }
+    });
+};
+
+export const getInteriorConditions = <ThrowOnError extends boolean = false>(options?: Options<GetInteriorConditionsData, ThrowOnError>) => {
+    return (options?.client ?? client).get<GetInteriorConditionsResponses, unknown, ThrowOnError>({
+        url: '/api/mechanical-condition/interior',
+        ...options
+    });
+};
+
+export const getExteriorConditions = <ThrowOnError extends boolean = false>(options?: Options<GetExteriorConditionsData, ThrowOnError>) => {
+    return (options?.client ?? client).get<GetExteriorConditionsResponses, unknown, ThrowOnError>({
+        url: '/api/mechanical-condition/exterior',
+        ...options
+    });
+};
+
+export const getElectricalConditions = <ThrowOnError extends boolean = false>(options?: Options<GetElectricalConditionsData, ThrowOnError>) => {
+    return (options?.client ?? client).get<GetElectricalConditionsResponses, unknown, ThrowOnError>({
+        url: '/api/mechanical-condition/electrical',
+        ...options
     });
 };
 

@@ -28,9 +28,9 @@ export type CreateRecordResponse = {
 };
 
 export type CreateMechanicalConditionRequest = {
-    part_name?: string;
-    part_condition_state?: string;
-    condition_type?: string;
+    partName?: string;
+    partConditionState?: string;
+    conditionType?: string;
 };
 
 export type CreateMechanicalConditionResponse = {
@@ -64,15 +64,8 @@ export type CreateClientResponse = {
     cellphone_name?: string;
 };
 
-export type CreateCarRequest = {
-    vin?: string;
-    license_plate?: string;
-    model_id?: number;
-};
-
-export type CreateCarResponse = {
-    id?: number;
-    license_plate?: string;
+export type CreateCarBrandRequest = {
+    brand_name?: string;
 };
 
 export type CreateCarModelRequest = {
@@ -82,15 +75,57 @@ export type CreateCarModelRequest = {
     brand_id?: number;
 };
 
+export type CreateCarRequest = {
+    vin?: string;
+    license_plate?: string;
+    model_id?: number;
+};
+
+export type CreateCheckInRequest = {
+    clientId?: number;
+    client?: CreateClientRequest;
+    carId?: number;
+    car?: CreateCarRequest;
+    carModel?: CreateCarModelRequest;
+    carBrand?: CreateCarBrandRequest;
+    mechanicalConditionsIds: Array<number>;
+    toolsIds: Array<number>;
+    newTools: Array<CreateToolRequest>;
+    reason: string;
+    recordState: CreateRecordStateRequest;
+    gasLevel: string;
+    valuables?: string;
+};
+
+export type CreateRecordStateRequest = {
+    entryDate: string;
+    entryTime: string;
+    mileage: number;
+};
+
+export type CreateCheckInResponse = {
+    id?: number;
+    entry_date?: string;
+    entry_time?: string;
+    mileage?: number;
+    gas_level?: string;
+    valuables?: string;
+    client_id?: number;
+    car_id?: number;
+    mechanical_conditions_ids?: Array<number>;
+    tools_ids?: Array<number>;
+};
+
+export type CreateCarResponse = {
+    id?: number;
+    license_plate?: string;
+};
+
 export type CreateCarModelResponse = {
     id?: number;
     model_name?: string;
     model_type?: string;
     model_year?: number;
-};
-
-export type CreateCarBrandRequest = {
-    brand_name?: string;
 };
 
 export type CreateCarBrandResponse = {
@@ -108,6 +143,12 @@ export type GetRecordResponse = {
     car_license_plate?: string;
     client_first_name?: string;
     mechanic_first_name?: string;
+};
+
+export type SingleMechanicalCondition = {
+    id: number;
+    partName: string;
+    conditionState: string;
 };
 
 export type MechanicInfo = {
@@ -304,6 +345,38 @@ export type CreateClientResponses = {
 
 export type CreateClientResponse2 = CreateClientResponses[keyof CreateClientResponses];
 
+export type GetAllCheckInsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/checkin';
+};
+
+export type GetAllCheckInsResponses = {
+    /**
+     * OK
+     */
+    200: Array<CreateCheckInResponse>;
+};
+
+export type GetAllCheckInsResponse = GetAllCheckInsResponses[keyof GetAllCheckInsResponses];
+
+export type CreateCheckInData = {
+    body: CreateCheckInRequest;
+    path?: never;
+    query?: never;
+    url: '/api/checkin';
+};
+
+export type CreateCheckInResponses = {
+    /**
+     * OK
+     */
+    200: CreateCheckInResponse;
+};
+
+export type CreateCheckInResponse2 = CreateCheckInResponses[keyof CreateCheckInResponses];
+
 export type GetAllCarsData = {
     body?: never;
     path?: never;
@@ -399,6 +472,54 @@ export type CreateMechanic1Responses = {
 };
 
 export type CreateMechanic1Response = CreateMechanic1Responses[keyof CreateMechanic1Responses];
+
+export type GetInteriorConditionsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/mechanical-condition/interior';
+};
+
+export type GetInteriorConditionsResponses = {
+    /**
+     * OK
+     */
+    200: Array<SingleMechanicalCondition>;
+};
+
+export type GetInteriorConditionsResponse = GetInteriorConditionsResponses[keyof GetInteriorConditionsResponses];
+
+export type GetExteriorConditionsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/mechanical-condition/exterior';
+};
+
+export type GetExteriorConditionsResponses = {
+    /**
+     * OK
+     */
+    200: Array<SingleMechanicalCondition>;
+};
+
+export type GetExteriorConditionsResponse = GetExteriorConditionsResponses[keyof GetExteriorConditionsResponses];
+
+export type GetElectricalConditionsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/mechanical-condition/electrical';
+};
+
+export type GetElectricalConditionsResponses = {
+    /**
+     * OK
+     */
+    200: Array<SingleMechanicalCondition>;
+};
+
+export type GetElectricalConditionsResponse = GetElectricalConditionsResponses[keyof GetElectricalConditionsResponses];
 
 export type GetCarFullData = {
     body?: never;
