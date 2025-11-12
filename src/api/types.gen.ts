@@ -5,12 +5,12 @@ export type ClientOptions = {
 };
 
 export type CreateToolRequest = {
-    tool_name?: string;
+    name: string;
 };
 
-export type CreateToolResponse = {
-    id?: number;
-    tool_name?: string;
+export type SingleToolResponse = {
+    id: number;
+    name: string;
 };
 
 export type CreateRecordRequest = {
@@ -52,11 +52,12 @@ export type CreateMechanicResponse = {
 };
 
 export type CreateClientRequest = {
-    first_name?: string;
-    last_name?: string;
-    email_address?: string;
-    address?: string;
-    cellphone_number?: string;
+    firstName: string;
+    rut: string;
+    lastName: string;
+    emailAddress: string;
+    address: string;
+    cellphoneNumber: string;
 };
 
 export type CreateClientResponse = {
@@ -65,20 +66,20 @@ export type CreateClientResponse = {
 };
 
 export type CreateCarBrandRequest = {
-    brand_name?: string;
+    brandName?: string;
 };
 
 export type CreateCarModelRequest = {
-    model_name?: string;
-    model_type?: string;
-    model_year?: number;
-    brand_id?: number;
+    modelName: string;
+    modelType: string;
+    modelYear?: number;
+    brandId?: number;
 };
 
 export type CreateCarRequest = {
-    vin?: string;
-    license_plate?: string;
-    model_id?: number;
+    VIN: string;
+    licensePlate: string;
+    modelId?: number;
 };
 
 export type CreateCheckInRequest = {
@@ -133,11 +134,6 @@ export type CreateCarBrandResponse = {
     registration_number?: string;
 };
 
-export type GetToolResponse = {
-    id?: number;
-    tool_name?: string;
-};
-
 export type GetRecordResponse = {
     reason?: string;
     car_license_plate?: string;
@@ -167,24 +163,61 @@ export type ClientInfo = {
     cellphoneNumber?: string;
 };
 
+export type GetCheckInBasicResponse = {
+    checkInId?: number;
+    clientName?: string;
+    clientEmail?: string;
+    brandName?: string;
+    modelName?: string;
+    modelType?: string;
+    modelYear?: number;
+    licensePlate?: string;
+    reason?: string;
+    mechanicalConditionPartNames?: Array<string>;
+    mechanicalConditionStates?: Array<string>;
+    entryDate?: string;
+    entryTime?: string;
+};
+
+export type GetCheckInFullResponse = {
+    checkInId?: number;
+    clientId?: number;
+    clientName?: string;
+    clientEmail?: string;
+    brandName?: string;
+    modelName?: string;
+    modelType?: string;
+    modelYear?: number;
+    licensePlate?: string;
+    reason?: string;
+    mechanicalConditionPartNames?: Array<string>;
+    mechanicalConditionStates?: Array<string>;
+    toolNames?: Array<string>;
+    entryDate?: string;
+    entryTime?: string;
+    mileage?: number;
+    gasLevel?: string;
+    valuables?: string;
+};
+
 export type GetCarResponse = {
-    id?: number;
-    vin?: string;
-    license_plate?: string;
-    model_id?: number;
-    model_name?: string;
+    id: number;
+    VIN: string;
+    licensePlate: string;
+    modelId: number;
+    modelName: string;
 };
 
 export type GetCarFullResponse = {
-    id?: number;
-    vin?: string;
-    license_plate?: string;
-    model_id?: number;
-    model_name?: string;
-    model_type?: string;
-    model_year?: number;
-    brand_id?: number;
-    brand_name?: string;
+    id: number;
+    VIN: string;
+    licensePlate: string;
+    modelId: number;
+    modelName: string;
+    modelType: string;
+    modelYear: number;
+    brandId: number;
+    brandName: string;
 };
 
 export type GetCarModelResponse = {
@@ -196,9 +229,9 @@ export type GetCarModelResponse = {
     brand_name?: string;
 };
 
-export type GetCarBrandRepsonse = {
-    id?: number;
-    brand_name?: string;
+export type SingleCarBrandResponse = {
+    id: number;
+    brandName: string;
 };
 
 export type GetAllToolsData = {
@@ -212,7 +245,7 @@ export type GetAllToolsResponses = {
     /**
      * OK
      */
-    200: Array<GetToolResponse>;
+    200: Array<SingleToolResponse>;
 };
 
 export type GetAllToolsResponse = GetAllToolsResponses[keyof GetAllToolsResponses];
@@ -228,10 +261,10 @@ export type CreateToolResponses = {
     /**
      * OK
      */
-    200: CreateToolResponse;
+    200: SingleToolResponse;
 };
 
-export type CreateToolResponse2 = CreateToolResponses[keyof CreateToolResponses];
+export type CreateToolResponse = CreateToolResponses[keyof CreateToolResponses];
 
 export type GetAllRecordsData = {
     body?: never;
@@ -345,21 +378,21 @@ export type CreateClientResponses = {
 
 export type CreateClientResponse2 = CreateClientResponses[keyof CreateClientResponses];
 
-export type GetAllCheckInsData = {
+export type GetAllCheckInFullData = {
     body?: never;
     path?: never;
     query?: never;
     url: '/api/checkin';
 };
 
-export type GetAllCheckInsResponses = {
+export type GetAllCheckInFullResponses = {
     /**
      * OK
      */
-    200: Array<CreateCheckInResponse>;
+    200: Array<GetCheckInBasicResponse>;
 };
 
-export type GetAllCheckInsResponse = GetAllCheckInsResponses[keyof GetAllCheckInsResponses];
+export type GetAllCheckInFullResponse = GetAllCheckInFullResponses[keyof GetAllCheckInFullResponses];
 
 export type CreateCheckInData = {
     body: CreateCheckInRequest;
@@ -452,7 +485,7 @@ export type GetAllCarBrandsResponses = {
     /**
      * OK
      */
-    200: Array<GetCarBrandRepsonse>;
+    200: Array<SingleCarBrandResponse>;
 };
 
 export type GetAllCarBrandsResponse = GetAllCarBrandsResponses[keyof GetAllCarBrandsResponses];
@@ -521,7 +554,25 @@ export type GetElectricalConditionsResponses = {
 
 export type GetElectricalConditionsResponse = GetElectricalConditionsResponses[keyof GetElectricalConditionsResponses];
 
-export type GetCarFullData = {
+export type GetCheckInFullData = {
+    body?: never;
+    path: {
+        id: number;
+    };
+    query?: never;
+    url: '/api/checkin/{id}/full';
+};
+
+export type GetCheckInFullResponses = {
+    /**
+     * OK
+     */
+    200: GetCheckInFullResponse;
+};
+
+export type GetCheckInFullResponse2 = GetCheckInFullResponses[keyof GetCheckInFullResponses];
+
+export type GetCarFullByIdData = {
     body?: never;
     path: {
         id: number;
@@ -530,14 +581,48 @@ export type GetCarFullData = {
     url: '/api/car/{id}';
 };
 
-export type GetCarFullResponses = {
+export type GetCarFullByIdResponses = {
     /**
      * OK
      */
     200: GetCarFullResponse;
 };
 
-export type GetCarFullResponse2 = GetCarFullResponses[keyof GetCarFullResponses];
+export type GetCarFullByIdResponse = GetCarFullByIdResponses[keyof GetCarFullByIdResponses];
+
+export type GetAllPatentsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/car/patents';
+};
+
+export type GetAllPatentsResponses = {
+    /**
+     * OK
+     */
+    200: Array<string>;
+};
+
+export type GetAllPatentsResponse = GetAllPatentsResponses[keyof GetAllPatentsResponses];
+
+export type GetCarFullByPatentData = {
+    body?: never;
+    path: {
+        patent: string;
+    };
+    query?: never;
+    url: '/api/car/by-patent/{patent}';
+};
+
+export type GetCarFullByPatentResponses = {
+    /**
+     * OK
+     */
+    200: GetCarFullResponse;
+};
+
+export type GetCarFullByPatentResponse = GetCarFullByPatentResponses[keyof GetCarFullByPatentResponses];
 
 export type GetCarModelData = {
     body?: never;

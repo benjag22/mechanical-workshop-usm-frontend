@@ -80,7 +80,12 @@ export default function WorkOrderDetail({params}: { params: Promise<{ id: number
   const {id} = use(params);
 
   const workOrder = mockWorkOrder;
-
+  const photos = [
+    { id: 1, label: "Frontal" },
+    { id: 2, label: "Lateral Izquierdo" },
+    { id: 3, label: "Interior" },
+    { id: 4, label: "Motor" },
+  ];
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
       <div className="bg-white border-b border-slate-200 shadow-sm">
@@ -95,13 +100,6 @@ export default function WorkOrderDetail({params}: { params: Promise<{ id: number
               </p>
             </div>
             <div className="flex gap-3">
-              <button className={cn(
-                "px-4 py-2 rounded-lg font-medium",
-                "bg-white border-2 border-slate-300 text-slate-700",
-                "hover:bg-slate-50 transition-colors"
-              )}>
-                Imprimir
-              </button>
               <button className={cn(
                 "px-4 py-2 rounded-lg font-medium",
                 "bg-blue-600 text-white",
@@ -131,7 +129,7 @@ export default function WorkOrderDetail({params}: { params: Promise<{ id: number
               </p>
             </div>
             <ServicesChecklistCard services={workOrder.services} />
-            <VehiclePhotosCard photos={workOrder.carPhotos} />
+            <VehiclePhotosCard photos={photos} />
           </div>
 
           <div className="space-y-6">
