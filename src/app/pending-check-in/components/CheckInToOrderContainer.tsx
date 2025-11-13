@@ -1,13 +1,13 @@
 import {cn} from "@/app/cn";
-import {CheckIn} from "@/app/pending-check-in/page";
+import {GetCheckInBasicResponse} from "@/api";
+
 import Link from "next/link";
 
 type CheckInToOrderContainerProps = {
-    checkIn: CheckIn;
+    checkIn: GetCheckInBasicResponse;
 }
 
 export default function CheckInToOrderContainer({ checkIn }: CheckInToOrderContainerProps) {
-    const { carAssociated, clientAssociated, reason, observations, conditions } = checkIn;
 
     return (
         <div className={cn(
@@ -19,18 +19,18 @@ export default function CheckInToOrderContainer({ checkIn }: CheckInToOrderConta
                 <div className={cn("flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2")}>
                     <div className={cn("flex-1")}>
                         <h3 className={cn("text-lg font-semibold text-slate-100")}>
-                            {carAssociated.brand} {carAssociated.modelName} ({carAssociated.year})
+                            {checkIn.brandName} {checkIn.modelName} ({checkIn.modelYear})
                         </h3>
                         <p className={cn("text-slate-300 text-sm font-mono")}>
-                            Patente: {carAssociated.patent}
+                            Patente: {checkIn.licensePlate}
                         </p>
                     </div>
                     <div className={cn("text-right")}>
                         <p className={cn("text-slate-200 font-medium")}>
-                            {clientAssociated.firstName} {clientAssociated.lastName}
+                            {checkIn.clientName}
                         </p>
                         <p className={cn("text-slate-400 text-sm")}>
-                            {clientAssociated.emailAddress}
+                            {checkIn.clientEmail}
                         </p>
                     </div>
                 </div>
@@ -38,19 +38,15 @@ export default function CheckInToOrderContainer({ checkIn }: CheckInToOrderConta
                 <div className={cn("space-y-2")}>
                     <div>
                         <span className={cn("text-slate-300 text-sm font-medium")}>Motivo: </span>
-                        <span className={cn("text-slate-100")}>{reason}</span>
-                    </div>
-                    <div>
-                        <span className={cn("text-slate-300 text-sm font-medium")}>Observaciones: </span>
-                        <span className={cn("text-slate-100 text-sm")}>{observations}</span>
+                        <span className={cn("text-slate-100")}>{checkIn.reason}</span>
                     </div>
                 </div>
 
-                {conditions.length > 0 && (
+                {checkIn.conditions.length > 0 && (
                     <div className={cn("space-y-1")}>
                         <span className={cn("text-slate-300 text-sm font-medium")}>Condiciones reportadas:</span>
                         <div className={cn("flex flex-wrap gap-2")}>
-                            {conditions.map((condition, index) => (
+                            {checkIn.conditions.map((condition, index) => (
                                 <span
                                     key={index}
                                     className={cn(
@@ -58,7 +54,7 @@ export default function CheckInToOrderContainer({ checkIn }: CheckInToOrderConta
                                         "bg-slate-700 text-slate-200 border border-slate-600"
                                     )}
                                 >
-                                    {condition.nameCondition}: {condition.state}
+                                    {condition.partName}: {condition.state}
                                 </span>
                             ))}
                         </div>
@@ -68,7 +64,7 @@ export default function CheckInToOrderContainer({ checkIn }: CheckInToOrderConta
 
             <div className={cn("flex items-center lg:ml-6 mt-4 lg:mt-0")}>
                 <Link
-                    href={`pending-check-in/generate/${checkIn.id}`}
+                    href={`pending-check-in/generate/${checkIn.checkInId}`}
                     className={cn(
                         "w-full h-full flex items-center justify-center lg:w-auto px-6 py-3 bg-blue-600 hover:bg-blue-700",
                         "text-white font-medium rounded-lg transition-colors duration-200",

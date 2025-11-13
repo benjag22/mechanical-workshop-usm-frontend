@@ -4,6 +4,29 @@ export type ClientOptions = {
     baseUrl: 'http://localhost:8080' | (string & {});
 };
 
+export type CreateWorkOrderResponse = {
+    /**
+     * ID del work order creado
+     */
+    id?: number;
+    /**
+     * ID del record asociado
+     */
+    recordId?: number;
+    /**
+     * Fecha estimada en formato yyyy-MM-dd
+     */
+    estimatedDate?: string;
+    /**
+     * Hora estimada en formato HH:mm[:ss]
+     */
+    estimatedTime?: string;
+    /**
+     * Ruta al archivo de firma (si existe)
+     */
+    signaturePath?: string;
+};
+
 export type CreateToolRequest = {
     name: string;
 };
@@ -17,14 +40,18 @@ export type CreateRecordRequest = {
     reason?: string;
     car_id?: number;
     client_info_id?: number;
-    mechanic_info_id?: number;
 };
 
 export type CreateRecordResponse = {
     id?: number;
     car_id?: number;
     client_info_id?: number;
-    mechanic_info_id?: number;
+};
+
+export type CreatePictureResponse = {
+    id?: number;
+    alt?: string;
+    path?: string;
 };
 
 export type CreateMechanicalConditionRequest = {
@@ -69,25 +96,25 @@ export type CreateCarBrandRequest = {
     brandName?: string;
 };
 
-export type CreateCarModelRequest = {
+export type CreateCarCheckInRequest = {
+    VIN: string;
+    licensePlate: string;
+};
+
+export type CreateCarModelCheckInRequest = {
     modelName: string;
     modelType: string;
     modelYear?: number;
-    brandId?: number;
-};
-
-export type CreateCarRequest = {
-    VIN: string;
-    licensePlate: string;
-    modelId?: number;
 };
 
 export type CreateCheckInRequest = {
     clientId?: number;
     client?: CreateClientRequest;
     carId?: number;
-    car?: CreateCarRequest;
-    carModel?: CreateCarModelRequest;
+    car?: CreateCarCheckInRequest;
+    carModelID?: number;
+    carModel?: CreateCarModelCheckInRequest;
+    carBrandID?: number;
     carBrand?: CreateCarBrandRequest;
     mechanicalConditionsIds: Array<number>;
     toolsIds: Array<number>;
@@ -99,14 +126,18 @@ export type CreateCheckInRequest = {
 };
 
 export type CreateRecordStateRequest = {
-    entryDate: string;
+    /**
+     * Timestamp de entrada en formato ISO local date-time, e.g. 2025-11-12T09:30:00
+     */
     entryTime: string;
+    /**
+     * Kilometraje (entero >= 0)
+     */
     mileage: number;
 };
 
 export type CreateCheckInResponse = {
     id?: number;
-    entry_date?: string;
     entry_time?: string;
     mileage?: number;
     gas_level?: string;
@@ -117,9 +148,22 @@ export type CreateCheckInResponse = {
     tools_ids?: Array<number>;
 };
 
+export type CreateCarRequest = {
+    VIN: string;
+    licensePlate: string;
+    modelId?: number;
+};
+
 export type CreateCarResponse = {
     id?: number;
-    license_plate?: string;
+    licensePlate?: string;
+};
+
+export type CreateCarModelRequest = {
+    modelName: string;
+    modelType: string;
+    modelYear?: number;
+    brandId?: number;
 };
 
 export type CreateCarModelResponse = {
@@ -135,10 +179,10 @@ export type CreateCarBrandResponse = {
 };
 
 export type GetRecordResponse = {
+    id?: number;
     reason?: string;
     car_license_plate?: string;
     client_first_name?: string;
-    mechanic_first_name?: string;
 };
 
 export type SingleMechanicalCondition = {
@@ -164,19 +208,22 @@ export type ClientInfo = {
 };
 
 export type GetCheckInBasicResponse = {
-    checkInId?: number;
-    clientName?: string;
-    clientEmail?: string;
-    brandName?: string;
-    modelName?: string;
-    modelType?: string;
-    modelYear?: number;
-    licensePlate?: string;
-    reason?: string;
-    mechanicalConditionPartNames?: Array<string>;
-    mechanicalConditionStates?: Array<string>;
-    entryDate?: string;
-    entryTime?: string;
+    checkInId: number;
+    clientName: string;
+    clientEmail: string;
+    brandName: string;
+    modelName: string;
+    modelType: string;
+    modelYear: number;
+    licensePlate: string;
+    reason: string;
+    conditions: Array<MechanicalCondition>;
+    entryTime: string;
+};
+
+export type MechanicalCondition = {
+    partName: string;
+    state: string;
 };
 
 export type GetCheckInFullResponse = {
@@ -193,7 +240,6 @@ export type GetCheckInFullResponse = {
     mechanicalConditionPartNames?: Array<string>;
     mechanicalConditionStates?: Array<string>;
     toolNames?: Array<string>;
-    entryDate?: string;
     entryTime?: string;
     mileage?: number;
     gasLevel?: string;
@@ -221,18 +267,39 @@ export type GetCarFullResponse = {
 };
 
 export type GetCarModelResponse = {
-    id?: number;
-    model_name?: string;
-    model_type?: string;
-    model_year?: number;
-    brand_id?: number;
-    brand_name?: string;
+    id: number;
+    modelName: string;
+    modelType: string;
+    modelYear: number;
+    brandId: number;
+    brandName: string;
 };
 
 export type SingleCarBrandResponse = {
     id: number;
     brandName: string;
 };
+
+export type CreateFullData = {
+    body?: {
+        carPictures?: Array<Blob | File>;
+        signature?: Blob | File;
+    };
+    path?: never;
+    query: {
+        payload: string;
+    };
+    url: '/api/work-orders/full';
+};
+
+export type CreateFullResponses = {
+    /**
+     * OK
+     */
+    200: CreateWorkOrderResponse;
+};
+
+export type CreateFullResponse = CreateFullResponses[keyof CreateFullResponses];
 
 export type GetAllToolsData = {
     body?: never;
@@ -298,6 +365,41 @@ export type CreateRecordResponses = {
 
 export type CreateRecordResponse2 = CreateRecordResponses[keyof CreateRecordResponses];
 
+export type GetAllData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/picture';
+};
+
+export type GetAllResponses = {
+    /**
+     * OK
+     */
+    200: Array<CreatePictureResponse>;
+};
+
+export type GetAllResponse = GetAllResponses[keyof GetAllResponses];
+
+export type CreateData = {
+    body?: {
+        image: Blob | File;
+        alt?: string;
+    };
+    path?: never;
+    query?: never;
+    url: '/api/picture';
+};
+
+export type CreateResponses = {
+    /**
+     * OK
+     */
+    200: CreatePictureResponse;
+};
+
+export type CreateResponse = CreateResponses[keyof CreateResponses];
+
 export type CreateMechanicalConditionData = {
     body: CreateMechanicalConditionRequest;
     path?: never;
@@ -345,6 +447,41 @@ export type CreateMechanicResponses = {
 };
 
 export type CreateMechanicResponse2 = CreateMechanicResponses[keyof CreateMechanicResponses];
+
+export type GetAll1Data = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/dashboard-lights';
+};
+
+export type GetAll1Responses = {
+    /**
+     * OK
+     */
+    200: Array<CreatePictureResponse>;
+};
+
+export type GetAll1Response = GetAll1Responses[keyof GetAll1Responses];
+
+export type Create1Data = {
+    body?: {
+        image: Blob | File;
+        alt?: string;
+    };
+    path?: never;
+    query?: never;
+    url: '/api/dashboard-lights';
+};
+
+export type Create1Responses = {
+    /**
+     * OK
+     */
+    200: CreatePictureResponse;
+};
+
+export type Create1Response = Create1Responses[keyof Create1Responses];
 
 export type GetAllClientsData = {
     body?: never;
@@ -506,6 +643,24 @@ export type CreateMechanic1Responses = {
 
 export type CreateMechanic1Response = CreateMechanic1Responses[keyof CreateMechanic1Responses];
 
+export type GetData = {
+    body?: never;
+    path: {
+        id: number;
+    };
+    query?: never;
+    url: '/api/picture/{id}';
+};
+
+export type GetResponses = {
+    /**
+     * OK
+     */
+    200: CreatePictureResponse;
+};
+
+export type GetResponse = GetResponses[keyof GetResponses];
+
 export type GetInteriorConditionsData = {
     body?: never;
     path?: never;
@@ -553,6 +708,24 @@ export type GetElectricalConditionsResponses = {
 };
 
 export type GetElectricalConditionsResponse = GetElectricalConditionsResponses[keyof GetElectricalConditionsResponses];
+
+export type Get1Data = {
+    body?: never;
+    path: {
+        id: number;
+    };
+    query?: never;
+    url: '/api/dashboard-lights/{id}';
+};
+
+export type Get1Responses = {
+    /**
+     * OK
+     */
+    200: CreatePictureResponse;
+};
+
+export type Get1Response = Get1Responses[keyof Get1Responses];
 
 export type GetCheckInFullData = {
     body?: never;

@@ -32,7 +32,7 @@ const STATE_COLORS: Record<string, string> = {
   "Ausente": "bg-red-100 text-red-800 border-red-200"
 };
 
-export default function ListOfConditionsComponent({ onConditionsChange, selectedConditionIds }: Props) {
+export default function ListOfConditionsComponent({ onConditionsChange }: Props) {
   const [activeTab, setActiveTab] = useState<ConditionCategory>("interior");
   const [currentStates, setCurrentStates] = useState<ConditionState[]>([]);
   const [selectionStates, setSelectionStates] = useState<Map<number, ConditionSelectionState>>(new Map());

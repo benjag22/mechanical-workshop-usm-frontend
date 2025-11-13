@@ -166,11 +166,11 @@ export default function ExistsCarDetailComponent({ car, onBackAction, onCarDataC
                   "transition-all duration-200 hover:border-gray-600/50"
                 )}
               >
-                <option value="Full">Lleno</option>
-                <option value="3/4">3/4</option>
-                <option value="1/2">1/2</option>
-                <option value="1/4">1/4</option>
-                <option value="Low">Reserva</option>
+                <option value="FULL">Lleno</option>
+                <option value="THREE_QUARTERS">3/4</option>
+                <option value="HALF" >1/2</option>
+                <option value="ONE_QUARTER">1/4</option>
+                <option value="LOW">Reserva</option>
               </select>
             </div>
           </div>

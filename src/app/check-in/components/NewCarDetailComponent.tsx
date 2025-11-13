@@ -3,17 +3,19 @@
 import {cn} from "@/app/cn";
 import React, {useState, useEffect} from "react";
 import {Car, Hash, Calendar, Gauge, Fuel, FileText, ArrowLeft, Tag, Loader2} from "lucide-react";
-import api, {SingleCarBrandResponse} from "@/api";
+import api, {GetCarModelResponse, SingleCarBrandResponse} from "@/api";
 
 type NewCarData = {
   VIN: string;
   licensePlate: string;
+  modelId?: number;
   modelName: string;
   modelType: string;
   modelYear?: number;
   brandId?: number;
   brandName?: string;
   isNewBrand: boolean;
+  isNewModel: boolean;
   reason: string;
   mileage: number;
   fuelLevel: string;
@@ -23,17 +25,17 @@ type NewCarDetailComponentProps = {
   prefilledPatent?: string | null;
   onBackAction: () => void;
   onCarDataChange: (carData: {
-    car: {
+    car?: {
       VIN: string;
       licensePlate: string;
-      modelId?: number;
     };
-    carModel: {
+    carModelID?: number;
+    carModel?: {
       modelName: string;
       modelType: string;
       modelYear?: number;
-      brandId?: number;
     };
+    carBrandID?: number;
     carBrand?: {
       brandName: string;
     };
@@ -43,34 +45,43 @@ type NewCarDetailComponentProps = {
   }) => void;
 }
 
-
 export default function NewCarDetailComponent({ prefilledPatent, onBackAction, onCarDataChange }: NewCarDetailComponentProps){
   const [carData, setCarData] = useState<NewCarData>({
     VIN: '',
     licensePlate: prefilledPatent || '',
+    modelId: undefined,
     modelName: '',
     modelType: '',
     modelYear: undefined,
     brandId: undefined,
     brandName: '',
     isNewBrand: false,
+    isNewModel: false,
     reason: '',
     mileage: 0,
-    fuelLevel: "Full"
+    fuelLevel: "FULL"
   });
 
   const [brands, setBrands] = useState<SingleCarBrandResponse[]>([]);
+  const [allModels, setAllModels] = useState<GetCarModelResponse[]>([]);
+  const [filteredModels, setFilteredModels] = useState<GetCarModelResponse[]>([]);
   const [loadingBrands, setLoadingBrands] = useState(true);
 
   useEffect(() => {
     async function loadBrands() {
       try {
         setLoadingBrands(true);
-        const response = await api.getAllCarBrands();
-        setBrands(response.data || []);
+        const brandsResponse = await api.getAllCarBrands();
+        const modelsResponse = await api.getAllCarModels();
+
+        if(brandsResponse && modelsResponse){
+          setBrands(brandsResponse.data ?? []);
+          setAllModels(modelsResponse.data ?? []);
+        }
       } catch (error) {
-        console.error("Error loading brands:", error);
+        console.error(error);
         setBrands([]);
+        setAllModels([]);
       } finally {
         setLoadingBrands(false);
       }
@@ -80,30 +91,75 @@ export default function NewCarDetailComponent({ prefilledPatent, onBackAction, o
   }, []);
 
   useEffect(() => {
+    if (carData.brandId && !carData.isNewBrand) {
+      const modelsForBrand = allModels.filter(model => model.brandId === carData.brandId);
+      setFilteredModels(modelsForBrand);
+    } else {
+      setFilteredModels([]);
+    }
+  }, [carData.brandId, carData.isNewBrand, allModels]);
+
+  useEffect(() => {
     if (carData.VIN && carData.licensePlate && carData.modelName && carData.modelType) {
-      onCarDataChange({
-        car: {
-          VIN: carData.VIN,
-          licensePlate: carData.licensePlate,
-          modelId: undefined
-        },
-        carModel: {
-          modelName: carData.modelName,
-          modelType: carData.modelType,
-          modelYear: carData.modelYear,
-          brandId: carData.isNewBrand ? undefined : carData.brandId
-        },
-        carBrand: carData.isNewBrand && carData.brandName ? {
-          brandName: carData.brandName
-        } : undefined,
+      const updateData: {
+        car?: {
+          VIN: string;
+          licensePlate: string;
+        };
+        carModelID?: number;
+        carModel?: {
+          modelName: string;
+          modelType: string;
+          modelYear?: number;
+        };
+        carBrandID?: number;
+        carBrand?: {
+          brandName: string;
+        };
+        reason: string;
+        gasLevel: string;
+        mileage: number;
+      } = {
         reason: carData.reason,
         gasLevel: carData.fuelLevel,
         mileage: carData.mileage
-      });
+      };
+
+      if (!carData.isNewModel && carData.modelId) {
+        updateData.carModelID = carData.modelId;
+        updateData.car = {
+          VIN: carData.VIN,
+          licensePlate: carData.licensePlate,
+        };
+      }
+
+      else if (carData.isNewModel) {
+        updateData.car = {
+          VIN: carData.VIN,
+          licensePlate: carData.licensePlate,
+        };
+        updateData.carModel = {
+          modelName: carData.modelName,
+          modelType: carData.modelType,
+          modelYear: carData.modelYear,
+        };
+
+        if (!carData.isNewBrand && carData.brandId) {
+          updateData.carBrandID = carData.brandId;
+        }
+
+        else if (carData.isNewBrand && carData.brandName) {
+          updateData.carBrand = {
+            brandName: carData.brandName
+          };
+        }
+      }
+
+      onCarDataChange(updateData);
     }
   }, [carData, onCarDataChange]);
 
-  const handleInputChange = (field: keyof NewCarData, value: string | number | boolean) => {
+  const handleInputChange = (field: keyof NewCarData, value: string | number | boolean | undefined) => {
     setCarData(prev => ({
       ...prev,
       [field]: value
@@ -116,7 +172,12 @@ export default function NewCarDetailComponent({ prefilledPatent, onBackAction, o
         ...prev,
         isNewBrand: true,
         brandId: undefined,
-        brandName: ''
+        brandName: '',
+        modelId: undefined,
+        modelName: '',
+        modelType: '',
+        modelYear: undefined,
+        isNewModel: true
       }));
     } else if (value) {
       const brandId = parseInt(value);
@@ -124,14 +185,60 @@ export default function NewCarDetailComponent({ prefilledPatent, onBackAction, o
         ...prev,
         isNewBrand: false,
         brandId: brandId,
-        brandName: ''
+        brandName: '',
+        modelId: undefined,
+        modelName: '',
+        modelType: '',
+        modelYear: undefined,
+        isNewModel: false
       }));
     } else {
       setCarData(prev => ({
         ...prev,
         isNewBrand: false,
         brandId: undefined,
-        brandName: ''
+        brandName: '',
+        modelId: undefined,
+        modelName: '',
+        modelType: '',
+        modelYear: undefined,
+        isNewModel: false
+      }));
+    }
+  };
+
+  const handleModelChange = (value: string) => {
+    if (value === "new") {
+      setCarData(prev => ({
+        ...prev,
+        isNewModel: true,
+        modelId: undefined,
+        modelName: '',
+        modelType: '',
+        modelYear: undefined
+      }));
+    } else if (value) {
+      const modelId = parseInt(value);
+      const selectedModel = allModels.find(m => m.id === modelId);
+
+      if (selectedModel) {
+        setCarData(prev => ({
+          ...prev,
+          isNewModel: false,
+          modelId: modelId,
+          modelName: selectedModel.modelName,
+          modelType: selectedModel.modelType,
+          modelYear: selectedModel.modelYear
+        }));
+      }
+    } else {
+      setCarData(prev => ({
+        ...prev,
+        isNewModel: false,
+        modelId: undefined,
+        modelName: '',
+        modelType: '',
+        modelYear: undefined
       }));
     }
   };
@@ -224,7 +331,7 @@ export default function NewCarDetailComponent({ prefilledPatent, onBackAction, o
                   {brands.map(brand => (
                     <option key={brand.id} value={brand.id}>{brand.brandName}</option>
                   ))}
-                  <option value="new">➕ Nueva Marca</option>
+                  <option value="new"> Nueva Marca</option>
                 </select>
               )}
             </div>
@@ -250,66 +357,96 @@ export default function NewCarDetailComponent({ prefilledPatent, onBackAction, o
               </div>
             )}
 
-            <div className="space-y-1 lg:space-y-2">
-              <label className="text-xs lg:text-sm font-medium text-gray-300 flex items-center gap-2">
-                <Car className="w-3 h-3 lg:w-4 lg:h-4" />
-                Modelo <span className="text-red-400">*</span>
-              </label>
-              <input
-                type="text"
-                value={carData.modelName}
-                onChange={(e) => handleInputChange('modelName', e.target.value)}
-                className={cn(
-                  "w-full px-3 lg:px-4 py-2 lg:py-3 bg-gray-800/50 border border-gray-700/50 rounded-lg",
-                  "text-white placeholder-gray-500 backdrop-blur-sm text-sm lg:text-base",
-                  "focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50",
-                  "transition-all duration-200 hover:border-gray-600/50"
-                )}
-                placeholder="Corolla, Civic, Focus..."
-              />
-            </div>
+            {!carData.isNewBrand && carData.brandId && (
+              <div className="space-y-1 lg:space-y-2">
+                <label className="text-xs lg:text-sm font-medium text-gray-300 flex items-center gap-2">
+                  <Car className="w-3 h-3 lg:w-4 lg:h-4" />
+                  Modelo <span className="text-red-400">*</span>
+                </label>
+                <select
+                  value={carData.isNewModel ? "new" : (carData.modelId?.toString() || "")}
+                  onChange={(e) => handleModelChange(e.target.value)}
+                  className={cn(
+                    "w-full px-3 lg:px-4 py-2 lg:py-3 bg-gray-800/50 border border-gray-700/50 rounded-lg",
+                    "text-white backdrop-blur-sm text-sm lg:text-base",
+                    "focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50",
+                    "transition-all duration-200 hover:border-gray-600/50"
+                  )}
+                >
+                  <option value="">Seleccione un modelo</option>
+                  {filteredModels.map(model => (
+                    <option key={model.id} value={model.id}>
+                      {model.modelName} {model.modelYear ? `(${model.modelYear})` : ''}
+                    </option>
+                  ))}
+                  <option value="new">Nuevo Modelo</option>
+                </select>
+              </div>
+            )}
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
-            <div className="space-y-1 lg:space-y-2">
-              <label className="text-xs lg:text-sm font-medium text-gray-300 flex items-center gap-2">
-                <Calendar className="w-3 h-3 lg:w-4 lg:h-4" />
-                Año
-              </label>
-              <input
-                type="number"
-                value={carData.modelYear || ''}
-                onChange={(e) => handleInputChange('modelYear', e.target.value )}
-                className={cn(
-                  "w-full px-3 lg:px-4 py-2 lg:py-3 bg-gray-800/50 border border-gray-700/50 rounded-lg",
-                  "text-white placeholder-gray-500 backdrop-blur-sm text-sm lg:text-base",
-                  "focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50",
-                  "transition-all duration-200 hover:border-gray-600/50"
-                )}
-                placeholder="2024"
-                min={1900}
-                max={new Date().getFullYear() + 1}
-              />
-            </div>
+          {(carData.isNewBrand || carData.isNewModel) && (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
+              <div className="space-y-1 lg:space-y-2">
+                <label className="text-xs lg:text-sm font-medium text-gray-300 flex items-center gap-2">
+                  <Car className="w-3 h-3 lg:w-4 lg:h-4" />
+                  Nombre del Modelo <span className="text-red-400">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={carData.modelName}
+                  onChange={(e) => handleInputChange('modelName', e.target.value)}
+                  className={cn(
+                    "w-full px-3 lg:px-4 py-2 lg:py-3 bg-gray-800/50 border border-gray-700/50 rounded-lg",
+                    "text-white placeholder-gray-500 backdrop-blur-sm text-sm lg:text-base",
+                    "focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50",
+                    "transition-all duration-200 hover:border-gray-600/50"
+                  )}
+                  placeholder="Corolla, Civic, Focus..."
+                />
+              </div>
 
-            <div className="space-y-1 lg:space-y-2">
-              <label className="text-xs lg:text-sm font-medium text-gray-300 flex items-center gap-2">
-                <Car className="w-3 h-3 lg:w-4 lg:h-4" />
-                Tipo de Vehículo <span className="text-red-400">*</span>
-              </label>
-              <input
-                value={carData.modelType}
-                onChange={(e) => handleInputChange('modelType', e.target.value)}
-                className={cn(
-                  "w-full px-3 lg:px-4 py-2 lg:py-3 bg-gray-800/50 border border-gray-700/50 rounded-lg",
-                  "text-white backdrop-blur-sm text-sm lg:text-base",
-                  "focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50",
-                  "transition-all duration-200 hover:border-gray-600/50"
-                )}
-              >
-              </input>
+              <div className="space-y-1 lg:space-y-2">
+                <label className="text-xs lg:text-sm font-medium text-gray-300 flex items-center gap-2">
+                  <Car className="w-3 h-3 lg:w-4 lg:h-4" />
+                  Tipo de Vehículo <span className="text-red-400">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={carData.modelType}
+                  onChange={(e) => handleInputChange('modelType', e.target.value)}
+                  className={cn(
+                    "w-full px-3 lg:px-4 py-2 lg:py-3 bg-gray-800/50 border border-gray-700/50 rounded-lg",
+                    "text-white placeholder-gray-500 backdrop-blur-sm text-sm lg:text-base",
+                    "focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50",
+                    "transition-all duration-200 hover:border-gray-600/50"
+                  )}
+                  placeholder="Sedán, SUV, Hatchback..."
+                />
+              </div>
+
+              <div className="space-y-1 lg:space-y-2">
+                <label className="text-xs lg:text-sm font-medium text-gray-300 flex items-center gap-2">
+                  <Calendar className="w-3 h-3 lg:w-4 lg:h-4" />
+                  Año
+                </label>
+                <input
+                  type="number"
+                  value={carData.modelYear || ''}
+                  onChange={(e) => handleInputChange('modelYear', e.target.value ? parseInt(e.target.value) : undefined)}
+                  className={cn(
+                    "w-full px-3 lg:px-4 py-2 lg:py-3 bg-gray-800/50 border border-gray-700/50 rounded-lg",
+                    "text-white placeholder-gray-500 backdrop-blur-sm text-sm lg:text-base",
+                    "focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50",
+                    "transition-all duration-200 hover:border-gray-600/50"
+                  )}
+                  placeholder="2024"
+                  min={1900}
+                  max={new Date().getFullYear() + 1}
+                />
+              </div>
             </div>
-          </div>
+          )}
 
           <div className="space-y-1 lg:space-y-2">
             <label className="text-xs lg:text-sm font-medium text-gray-300 flex items-center gap-2">
@@ -365,11 +502,11 @@ export default function NewCarDetailComponent({ prefilledPatent, onBackAction, o
                   "transition-all duration-200 hover:border-gray-600/50"
                 )}
               >
-                <option value="Full">Lleno</option>
-                <option value="3/4">3/4</option>
-                <option value="1/2">1/2</option>
-                <option value="1/4">1/4</option>
-                <option value="Low">Reserva</option>
+                <option value="FULL">Lleno</option>
+                <option value="THREE_QUARTERS">3/4</option>
+                <option value="HALF">1/2</option>
+                <option value="ONE_QUARTER">1/4</option>
+                <option value="LOW">Reserva</option>
               </select>
             </div>
           </div>

@@ -22,12 +22,12 @@ export default function CheckInPage() {
     toolsIds: [],
     reason: "",
     recordState: {
-      entryDate: new Date().toISOString(),
-      entryTime: new Date().toISOString(),
+      entryTime: new Date().toISOString().replace('Z', ''),
       mileage: 0
     },
     gasLevel: "",
   });
+
   const handleClientData = useCallback((clientData: CreateClientRequest) => {
     setCheckInRequest(prev =>
       produce(prev, (draft) => {
@@ -45,8 +45,6 @@ export default function CheckInPage() {
     );
   }, []);
 
-  console.log(checkInRequest)
-
   const handleTools = useCallback((toolIds: number[], newTools: string[]) => {
     setCheckInRequest(prev =>
       produce(prev, (draft) => {
@@ -61,14 +59,14 @@ export default function CheckInPage() {
     car?: {
       VIN: string;
       licensePlate: string;
-      modelId?: number;
     };
+    carModelID?: number;
     carModel?: {
       modelName: string;
       modelType: string;
       modelYear?: number;
-      brandId?: number;
     };
+    carBrandID?: number;
     carBrand?: {
       brandName: string;
     };
@@ -78,26 +76,43 @@ export default function CheckInPage() {
   }) => {
     setCheckInRequest(prev =>
       produce(prev, (draft) => {
+        draft.carId = undefined;
+        draft.car = undefined;
+        draft.carModelID = undefined;
+        draft.carModel = undefined;
+        draft.carBrandID = undefined;
+        draft.carBrand = undefined;
+
         if (carData.carId) {
           draft.carId = carData.carId;
-          draft.car = undefined;
-          draft.carModel = undefined;
-          draft.carBrand = undefined;
         }
         else if (carData.car) {
-          draft.carId = undefined;
           draft.car = carData.car;
-          draft.carModel = carData.carModel;
-          draft.carBrand = carData.carBrand;
+
+          if (carData.carModelID) {
+            draft.carModelID = carData.carModelID;
+          }
+          else if (carData.carModel) {
+            draft.carModel = carData.carModel;
+
+            if (carData.carBrandID) {
+              draft.carBrandID = carData.carBrandID;
+            }
+            else if (carData.carBrand) {
+              draft.carBrand = carData.carBrand;
+            }
+          }
         }
+
         draft.reason = carData.reason;
         draft.gasLevel = carData.gasLevel;
         draft.recordState.mileage = carData.mileage;
-        draft.recordState.entryDate = new Date().toISOString();
-        draft.recordState.entryTime = new Date().toISOString();
+        draft.recordState.entryTime = new Date().toISOString().replace('Z', '');
       })
     );
   }, []);
+
+  console.log('CheckInRequest:', JSON.stringify(checkInRequest, null, 2));
 
   const sections: Section[] = [
     {
@@ -135,10 +150,11 @@ export default function CheckInPage() {
 
   async function handleFinish() {
     try {
-      await api.createCheckIn({body:checkInRequest})
-
+      console.log('Enviando CheckIn:', JSON.stringify(checkInRequest, null, 2));
+      const response = await api.createCheckIn({body: checkInRequest});
+      console.log('CheckIn creado:', response);
     } catch (error) {
-      console.error(error);
+      console.error('Error al crear CheckIn:', error);
     }
   }
 
