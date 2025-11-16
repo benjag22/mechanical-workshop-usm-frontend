@@ -1,7 +1,7 @@
 import {cn} from "@/app/cn";
 import {Check} from "lucide-react";
 import {useState, useEffect} from "react";
-import {ConditionState} from "@/app/check-in/components/ListOfConditionsComponent";
+import {ConditionState} from "@/app/check-in/components/ListOfConditionsByType";
 import {SingleMechanicalCondition} from "@/api";
 
 type Props = {
@@ -38,7 +38,6 @@ export default function SelectConditionComponent({condition, onStateChange, onSe
   const [selectedState, setSelectedState] = useState<State | null>(initialState.selectedState as State | null);
   const [isIncluded, setIsIncluded] = useState<boolean>(initialState.isIncluded);
 
-  // Sincronizar con el estado inicial cuando cambia
   useEffect(() => {
     setIsIncluded(initialState.isIncluded);
     setSelectedState(initialState.selectedState as State | null);

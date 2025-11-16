@@ -4,7 +4,7 @@ import {cn} from "@/app/cn";
 import {ReactNode, useCallback, useState} from "react";
 import ClientInfoDetailComponent from "@/app/check-in/components/ClientInfoDetailComponent";
 import PatentListComponent from "@/app/check-in/components/PatentListComponent";
-import ListOfConditionsComponent from "@/app/check-in/components/ListOfConditionsComponent";
+import ListOfConditionsByType from "@/app/check-in/components/ListOfConditionsByType";
 import SelectToolsComponent from "@/app/check-in/components/SelectToolsComponent";
 import api, {CreateCheckInRequest, CreateClientRequest} from "@/api";
 import {produce} from "immer";
@@ -17,12 +17,13 @@ type Section = {
 
 export default function CheckInPage() {
   const [checkInRequest, setCheckInRequest] = useState<CreateCheckInRequest>({
-    mechanicalConditionsIds: [],
+    exteriorConditionsIds: [],
+    interiorConditionsIds: [],
+    electricalConditionsIds: [],
     newTools: [],
     toolsIds: [],
     reason: "",
     recordState: {
-      entryTime: new Date().toISOString().replace('Z', ''),
       mileage: 0
     },
     gasLevel: "",
@@ -37,10 +38,20 @@ export default function CheckInPage() {
     );
   }, []);
 
-  const handleMechanicalConditions = useCallback((conditionIds: number[]) => {
+  const handleMechanicalConditions = useCallback((conditionIds: number[], type: "INTERIOR" | "EXTERIOR" | "ELECTRICAL") => {
     setCheckInRequest(prev =>
       produce(prev, (draft) => {
-        draft.mechanicalConditionsIds = conditionIds;
+        switch (type) {
+          case "INTERIOR":
+            draft.interiorConditionsIds = conditionIds;
+            break;
+          case "EXTERIOR":
+            draft.exteriorConditionsIds = conditionIds;
+            break;
+          case "ELECTRICAL":
+            draft.electricalConditionsIds = conditionIds;
+            break;
+        }
       })
     );
   }, []);
@@ -107,7 +118,6 @@ export default function CheckInPage() {
         draft.reason = carData.reason;
         draft.gasLevel = carData.gasLevel;
         draft.recordState.mileage = carData.mileage;
-        draft.recordState.entryTime = new Date().toISOString().replace('Z', '');
       })
     );
   }, []);
@@ -117,132 +127,145 @@ export default function CheckInPage() {
   const sections: Section[] = [
     {
       index: 0,
-      name: "Client information",
+      name: "Información del Cliente",
       children: <ClientInfoDetailComponent onClientDataChange={handleClientData} />
     },
     {
       index: 1,
-      name: "Car detail",
-      children: <PatentListComponent
-        onCarDataChange={handleCarData}
-      />
+      name: "Detalles del Vehículo",
+      children: <PatentListComponent onCarDataChange={handleCarData} />
     },
     {
       index: 2,
-      name: "Car condition",
-      children: <ListOfConditionsComponent
-        onConditionsChange={handleMechanicalConditions}
-        selectedConditionIds={checkInRequest.mechanicalConditionsIds}
-      />
+      name: "Condiciones de Interior",
+      children: (
+        <ListOfConditionsByType
+          type="INTERIOR"
+          onConditionsChange={handleMechanicalConditions}
+        />
+      )
     },
     {
       index: 3,
-      name: "Tools",
-      children: <SelectToolsComponent
-        onToolsChange={handleTools}
-        selectedToolIds={checkInRequest.toolsIds}
-        selectedNewTools={checkInRequest.newTools.map(t => t.name)}
-      />
+      name: "Condiciones de Exterior",
+      children: (
+        <ListOfConditionsByType
+          type="EXTERIOR"
+          onConditionsChange={handleMechanicalConditions}
+        />
+      )
+    },
+    {
+      index: 4,
+      name: "Condiciones Eléctricas",
+      children: (
+        <ListOfConditionsByType
+          type="ELECTRICAL"
+          onConditionsChange={handleMechanicalConditions}
+        />
+      )
+    },
+    {
+      index: 5,
+      name: "Herramientas",
+      children: (
+        <SelectToolsComponent
+          onToolsChange={handleTools}
+          selectedToolIds={checkInRequest.toolsIds}
+          selectedNewTools={checkInRequest.newTools.map(t => t.name)}
+        />
+      )
     }
-  ]
+  ];
 
   const [nSections, setNSections] = useState<number>(0);
 
   async function handleFinish() {
     try {
-      console.log('Enviando CheckIn:', JSON.stringify(checkInRequest, null, 2));
       const response = await api.createCheckIn({body: checkInRequest});
-      console.log('CheckIn creado:', response);
+
+      if (response.error) {
+        console.error(response.error);
+      } else {
+        console.log(response.data);
+      }
     } catch (error) {
-      console.error('Error al crear CheckIn:', error);
+      console.error(error);
     }
   }
 
   function renderButtons(n: number) {
-    switch (n) {
-      case 0:
-        return (
+    const isFirstStep = n === 0;
+    const isLastStep = n === sections.length - 1;
+
+    return (
+      <div className="flex items-center gap-4">
+        {!isFirstStep && (
           <button
-            onClick={() => setNSections(prevState => prevState + 1)}
+            onClick={() => setNSections(prev => prev - 1)}
+            className={cn(
+              "px-6 py-2.5 bg-slate-600 hover:bg-slate-700 text-white rounded-md",
+              "transition-all duration-200 ease-in-out font-medium text-sm",
+              "shadow-sm hover:shadow-md flex items-center gap-2"
+            )}
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            Atrás
+          </button>
+        )}
+
+        {isLastStep ? (
+          <button
+            onClick={handleFinish}
+            className={cn(
+              "px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md",
+              "transition-all duration-200 ease-in-out font-medium text-sm",
+              "shadow-sm hover:shadow-md flex items-center gap-2"
+            )}
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+            Finalizar Check-in
+          </button>
+        ) : (
+          <button
+            onClick={() => setNSections(prev => prev + 1)}
             className={cn(
               "px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-md",
               "transition-all duration-200 ease-in-out font-medium text-sm",
-              "shadow-sm hover:shadow-md"
+              "shadow-sm hover:shadow-md flex items-center gap-2"
             )}
           >
             Siguiente
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
           </button>
-        )
-      case sections.length - 1:
-        return (
-          <>
-            <button
-              onClick={() => setNSections(prevState => prevState - 1)}
-              className={cn(
-                "px-6 py-2.5 bg-slate-600 hover:bg-slate-700 text-white rounded-md",
-                "transition-all duration-200 ease-in-out font-medium text-sm",
-                "shadow-sm hover:shadow-md"
-              )}
-            >
-              Atrás
-            </button>
-            <button
-              onClick={handleFinish}
-              className={cn(
-                "px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md",
-                "transition-all duration-200 ease-in-out font-medium text-sm",
-                "shadow-sm hover:shadow-md"
-              )}
-            >
-              Finalizar
-            </button>
-          </>
-        )
-      default:
-        return (
-          <>
-            <button
-              onClick={() => setNSections(prevState => prevState - 1)}
-              className={cn(
-                "px-6 py-2.5 bg-slate-600 hover:bg-slate-700 text-white rounded-md",
-                "transition-all duration-200 ease-in-out font-medium text-sm",
-                "shadow-sm hover:shadow-md"
-              )}
-            >
-              Atrás
-            </button>
-            <button
-              onClick={() => setNSections(prevState => prevState + 1)}
-              className={cn(
-                "px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-md",
-                "transition-all duration-200 ease-in-out font-medium text-sm",
-                "shadow-sm hover:shadow-md"
-              )}
-            >
-              Siguiente
-            </button>
-          </>
-        )
-    }
+        )}
+      </div>
+    );
   }
 
   return (
     <div className={cn("flex flex-col bg-slate-800 w-full h-screen")}>
-      <div className={cn("flex flex-col px-8 py-6 bg-slate-700/30")}>
-        <div className={cn("flex items-center justify-center space-x-3")}>
+      <div className={cn("flex flex-col px-8 py-6 bg-slate-700/30 border-b border-slate-600/50")}>
+        <div className={cn("flex items-center justify-center space-x-3 overflow-x-auto pb-2")}>
           {sections.map((s, index) => (
-            <div key={s.index} className={cn("flex items-center")}>
+            <div key={s.index} className={cn("flex items-center flex-shrink-0")}>
               <div className={cn(
                 "flex items-center justify-center w-10 h-10 rounded-full",
                 "transition-all duration-300 ease-in-out text-sm font-medium",
                 nSections === s.index
-                  ? "bg-blue-600 text-white shadow-lg"
+                  ? "bg-blue-600 text-white shadow-lg ring-2 ring-blue-400"
                   : nSections > s.index
                     ? "bg-emerald-600 text-white"
                     : "bg-slate-600 text-slate-300"
               )}>
                 {nSections > s.index ? (
-                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                   </svg>
                 ) : (
@@ -252,7 +275,7 @@ export default function CheckInPage() {
 
               {index < sections.length - 1 && (
                 <div className={cn(
-                  "w-8 h-0.5 mx-2 transition-all duration-300",
+                  "w-12 h-0.5 mx-2 transition-all duration-300 rounded-full",
                   nSections > s.index
                     ? "bg-emerald-600"
                     : "bg-slate-600"
@@ -262,9 +285,12 @@ export default function CheckInPage() {
           ))}
         </div>
 
-        <div className={cn("flex items-center justify-center mt-4")}>
-          <p className={cn("text-slate-300 text-sm")}>
+        <div className={cn("flex flex-col items-center justify-center mt-4 space-y-1")}>
+          <p className={cn("text-slate-300 text-sm font-medium")}>
             Paso {nSections + 1} de {sections.length}
+          </p>
+          <p className={cn("text-slate-400 text-xs")}>
+            {sections[nSections].name}
           </p>
         </div>
       </div>
@@ -275,7 +301,7 @@ export default function CheckInPage() {
             <div
               key={section.index}
               className={cn(
-                "w-full h-full",
+                "w-full h-full transition-opacity duration-300",
                 nSections === section.index ? "block" : "hidden"
               )}
             >
@@ -285,11 +311,11 @@ export default function CheckInPage() {
         </div>
       </div>
 
-      <div className={cn("px-8 py-6 bg-slate-700/30")}>
-        <div className={cn("flex items-center justify-center space-x-4")}>
+      <div className={cn("px-8 py-6 bg-slate-700/30 border-t border-slate-600/50")}>
+        <div className={cn("flex items-center justify-center")}>
           {renderButtons(nSections)}
         </div>
       </div>
     </div>
-  )
+  );
 }

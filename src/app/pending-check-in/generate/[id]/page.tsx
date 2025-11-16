@@ -5,6 +5,7 @@ import DrawableCanvas from "@/app/components/DrawableCanvas"
 import ImageGallery, {ImageFile} from "@/app/components/ImageGallery"
 import SelectServices from "@/app/pending-check-in/components/SelectServices";
 import SummaryIndicatorLights from "@/app/pending-check-in/components/SummaryIndicatorLights";
+import SelectMechanics from "@/app/pending-check-in/components/SelectMechanics";
 
 type Section = {
     index: number
@@ -22,7 +23,7 @@ export default function GenerateByIdCheckIn({params}: { params: Promise<{ id: nu
     }
 
     const sections: Section[] = [
-        {index: 0, name: "General Information", children: <SummaryIndicatorLights />},
+        {index: 0, name: "Mechanics to work", children: <SelectMechanics />},
         {index: 1, name: "Lights Indicators", children: <SummaryIndicatorLights />},
         {index: 2, name: "Services", children: <SelectServices />},
         {

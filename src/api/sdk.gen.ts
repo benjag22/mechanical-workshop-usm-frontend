@@ -2,7 +2,7 @@
 
 import { type Client, formDataBodySerializer, type Options as Options2, type TDataShape } from './client';
 import { client } from './client.gen';
-import type { Create1Data, Create1Responses, CreateCarData, CreateCarModelData, CreateCarModelResponses, CreateCarResponses, CreateCheckInData, CreateCheckInResponses, CreateClientData, CreateClientResponses, CreateData, CreateFullData, CreateFullResponses, CreateMechanic1Data, CreateMechanic1Responses, CreateMechanicalConditionData, CreateMechanicalConditionResponses, CreateMechanicData, CreateMechanicResponses, CreateRecordData, CreateRecordResponses, CreateResponses, CreateToolData, CreateToolResponses, Get1Data, Get1Responses, GetAll1Data, GetAll1Responses, GetAllCarBrandsData, GetAllCarBrandsResponses, GetAllCarModelsData, GetAllCarModelsResponses, GetAllCarsData, GetAllCarsResponses, GetAllCheckInFullData, GetAllCheckInFullResponses, GetAllClientsData, GetAllClientsResponses, GetAllData, GetAllMechanicsData, GetAllMechanicsResponses, GetAllPatentsData, GetAllPatentsResponses, GetAllRecordsData, GetAllRecordsResponses, GetAllResponses, GetAllToolsData, GetAllToolsResponses, GetCarFullByIdData, GetCarFullByIdResponses, GetCarFullByPatentData, GetCarFullByPatentResponses, GetCarModelData, GetCarModelResponses, GetCheckInFullData, GetCheckInFullResponses, GetData, GetElectricalConditionsData, GetElectricalConditionsResponses, GetExteriorConditionsData, GetExteriorConditionsResponses, GetInteriorConditionsData, GetInteriorConditionsResponses, GetResponses } from './types.gen';
+import type { CreateCarData, CreateCarModelData, CreateCarModelResponses, CreateCarResponses, CreateCheckInData, CreateCheckInResponses, CreateClientData, CreateClientResponses, CreateData, CreateErrors, CreateFullData, CreateFullResponses, CreateMechanic1Data, CreateMechanic1Responses, CreateMechanicalConditionData, CreateMechanicalConditionResponses, CreateMechanicData, CreateMechanicResponses, CreateResponses, CreateToolData, CreateToolResponses, GetAll1Data, GetAll1Responses, GetAllCarBrandsData, GetAllCarBrandsResponses, GetAllCarModelsData, GetAllCarModelsResponses, GetAllCarsData, GetAllCarsResponses, GetAllCheckInFullData, GetAllCheckInFullResponses, GetAllClientsData, GetAllClientsResponses, GetAllData, GetAllMechanicsData, GetAllMechanicsResponses, GetAllPatentsData, GetAllPatentsResponses, GetAllResponses, GetAllToolsData, GetAllToolsResponses, GetCarFullByIdData, GetCarFullByIdResponses, GetCarFullByPatentData, GetCarFullByPatentResponses, GetCarModelData, GetCarModelResponses, GetCheckInFullData, GetCheckInFullResponses, GetElectricalConditionsData, GetElectricalConditionsResponses, GetExteriorConditionsData, GetExteriorConditionsResponses, GetImageCategoryData, GetImageCategoryResponses, GetInteriorConditionsData, GetInteriorConditionsResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
@@ -18,14 +18,47 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
     meta?: Record<string, unknown>;
 };
 
-export const createFull = <ThrowOnError extends boolean = false>(options: Options<CreateFullData, ThrowOnError>) => {
-    return (options.client ?? client).post<CreateFullResponses, unknown, ThrowOnError>({
+/**
+ * Retrieve all work services
+ *
+ * Returns a list of all existing work services.
+ */
+export const getAll = <ThrowOnError extends boolean = false>(options?: Options<GetAllData, ThrowOnError>) => {
+    return (options?.client ?? client).get<GetAllResponses, unknown, ThrowOnError>({
+        url: '/api/work-services',
+        ...options
+    });
+};
+
+/**
+ * Create a new work service
+ *
+ * Creates a new service specifying its name and estimated duration.
+ */
+export const create = <ThrowOnError extends boolean = false>(options: Options<CreateData, ThrowOnError>) => {
+    return (options.client ?? client).post<CreateResponses, CreateErrors, ThrowOnError>({
+        url: '/api/work-services',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
+
+/**
+ * Create a full work order
+ *
+ * Send a multipart request: the 'payload' part must be application/json (the JSON body), and carPictures/signature as file parts.
+ */
+export const createFull = <ThrowOnError extends boolean = false>(options?: Options<CreateFullData, ThrowOnError>) => {
+    return (options?.client ?? client).post<CreateFullResponses, unknown, ThrowOnError>({
         ...formDataBodySerializer,
         url: '/api/work-orders/full',
         ...options,
         headers: {
             'Content-Type': null,
-            ...options.headers
+            ...options?.headers
         }
     });
 };
@@ -44,43 +77,6 @@ export const createTool = <ThrowOnError extends boolean = false>(options: Option
         headers: {
             'Content-Type': 'application/json',
             ...options.headers
-        }
-    });
-};
-
-export const getAllRecords = <ThrowOnError extends boolean = false>(options?: Options<GetAllRecordsData, ThrowOnError>) => {
-    return (options?.client ?? client).get<GetAllRecordsResponses, unknown, ThrowOnError>({
-        url: '/api/record',
-        ...options
-    });
-};
-
-export const createRecord = <ThrowOnError extends boolean = false>(options: Options<CreateRecordData, ThrowOnError>) => {
-    return (options.client ?? client).post<CreateRecordResponses, unknown, ThrowOnError>({
-        url: '/api/record',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
-};
-
-export const getAll = <ThrowOnError extends boolean = false>(options?: Options<GetAllData, ThrowOnError>) => {
-    return (options?.client ?? client).get<GetAllResponses, unknown, ThrowOnError>({
-        url: '/api/picture',
-        ...options
-    });
-};
-
-export const create = <ThrowOnError extends boolean = false>(options?: Options<CreateData, ThrowOnError>) => {
-    return (options?.client ?? client).post<CreateResponses, unknown, ThrowOnError>({
-        ...formDataBodySerializer,
-        url: '/api/picture',
-        ...options,
-        headers: {
-            'Content-Type': null,
-            ...options?.headers
         }
     });
 };
@@ -110,25 +106,6 @@ export const createMechanic = <ThrowOnError extends boolean = false>(options: Op
         headers: {
             'Content-Type': 'application/json',
             ...options.headers
-        }
-    });
-};
-
-export const getAll1 = <ThrowOnError extends boolean = false>(options?: Options<GetAll1Data, ThrowOnError>) => {
-    return (options?.client ?? client).get<GetAll1Responses, unknown, ThrowOnError>({
-        url: '/api/dashboard-lights',
-        ...options
-    });
-};
-
-export const create1 = <ThrowOnError extends boolean = false>(options?: Options<Create1Data, ThrowOnError>) => {
-    return (options?.client ?? client).post<Create1Responses, unknown, ThrowOnError>({
-        ...formDataBodySerializer,
-        url: '/api/dashboard-lights',
-        ...options,
-        headers: {
-            'Content-Type': null,
-            ...options?.headers
         }
     });
 };
@@ -223,9 +200,14 @@ export const createMechanic1 = <ThrowOnError extends boolean = false>(options: O
     });
 };
 
-export const get = <ThrowOnError extends boolean = false>(options: Options<GetData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetResponses, unknown, ThrowOnError>({
-        url: '/api/picture/{id}',
+/**
+ * Get all work orders
+ *
+ * Returns a list of all work orders.
+ */
+export const getAll1 = <ThrowOnError extends boolean = false>(options?: Options<GetAll1Data, ThrowOnError>) => {
+    return (options?.client ?? client).get<GetAll1Responses, unknown, ThrowOnError>({
+        url: '/api/work-orders',
         ...options
     });
 };
@@ -251,9 +233,9 @@ export const getElectricalConditions = <ThrowOnError extends boolean = false>(op
     });
 };
 
-export const get1 = <ThrowOnError extends boolean = false>(options: Options<Get1Data, ThrowOnError>) => {
-    return (options.client ?? client).get<Get1Responses, unknown, ThrowOnError>({
-        url: '/api/dashboard-lights/{id}',
+export const getImageCategory = <ThrowOnError extends boolean = false>(options?: Options<GetImageCategoryData, ThrowOnError>) => {
+    return (options?.client ?? client).get<GetImageCategoryResponses, unknown, ThrowOnError>({
+        url: '/api/dashboard-lights',
         ...options
     });
 };
