@@ -10,7 +10,7 @@ type LightData = CreateImageRequest & {
 };
 
 type Props = {
-  onLightsChange?: (lights: CreateWorkOrderHasDashboardLightRequest[]) => void;
+  onLightsChange: (lights: CreateWorkOrderHasDashboardLightRequest[]) => void;
 }
 
 async function getLightsData(): Promise<CreateImageRequest[]> {

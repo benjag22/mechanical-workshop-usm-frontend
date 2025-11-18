@@ -122,8 +122,6 @@ export default function CheckInPage() {
     );
   }, []);
 
-  console.log('CheckInRequest:', JSON.stringify(checkInRequest, null, 2));
-
   const sections: Section[] = [
     {
       index: 0,

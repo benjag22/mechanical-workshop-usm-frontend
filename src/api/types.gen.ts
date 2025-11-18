@@ -4,19 +4,19 @@ export type ClientOptions = {
     baseUrl: 'http://localhost:8080' | (string & {});
 };
 
-export type CreateWorkServiceResponse = {
+export type GetWorkServiceResponse = {
     /**
      * ID del servicio
      */
-    id?: number;
+    id: number;
     /**
      * Nombre del servicio
      */
-    serviceName?: string;
+    name: string;
     /**
      * Tiempo estimado en formato HH:mm[:ss]
      */
-    estimatedTime?: string;
+    estimatedTime: string;
 };
 
 export type CreateWorkServiceRequest = {
@@ -25,9 +25,14 @@ export type CreateWorkServiceRequest = {
      */
     serviceName: string;
     /**
-     * Tiempo estimado en formato HH:mm o HH:mm:ss
+     * Tiempo estimado en formato HH:mm
      */
     estimatedTime: string;
+};
+
+export type CreateMechanicRequest = {
+    name?: string;
+    rut?: string;
 };
 
 export type CreateWorkOrderHasDashboardLightRequest = {
@@ -70,9 +75,17 @@ export type CreateWorkOrderRequest = {
      */
     mechanicIds: Array<number>;
     /**
+     * New mechanics to be created
+     */
+    newMechanics: Array<CreateMechanicRequest>;
+    /**
      * ID of the mechanic who will be the leader
      */
-    leaderMechanicId: number;
+    leaderMechanicId?: number;
+    /**
+     * New mechanics to be created
+     */
+    newLeaderMechanic?: CreateMechanicRequest;
 };
 
 /**
@@ -123,14 +136,9 @@ export type CreateMechanicalConditionResponse = {
     condition_type?: string;
 };
 
-export type CreateMechanicRequest = {
-    name?: string;
-    rut?: string;
-};
-
 export type CreateMechanicResponse = {
     id?: number;
-    registration_number?: string;
+    rut?: string;
 };
 
 export type CreateClientRequest = {
@@ -407,21 +415,21 @@ export type SingleCarBrandResponse = {
     brandName: string;
 };
 
-export type GetAllData = {
+export type GetAllWorkServicesData = {
     body?: never;
     path?: never;
     query?: never;
     url: '/api/work-services';
 };
 
-export type GetAllResponses = {
+export type GetAllWorkServicesResponses = {
     /**
      * List returned successfully
      */
-    200: Array<CreateWorkServiceResponse>;
+    200: Array<GetWorkServiceResponse>;
 };
 
-export type GetAllResponse = GetAllResponses[keyof GetAllResponses];
+export type GetAllWorkServicesResponse = GetAllWorkServicesResponses[keyof GetAllWorkServicesResponses];
 
 export type CreateData = {
     body: CreateWorkServiceRequest;
@@ -434,7 +442,7 @@ export type CreateErrors = {
     /**
      * Validation error
      */
-    400: CreateWorkServiceResponse;
+    400: GetWorkServiceResponse;
 };
 
 export type CreateError = CreateErrors[keyof CreateErrors];
@@ -443,7 +451,7 @@ export type CreateResponses = {
     /**
      * Service created successfully
      */
-    200: CreateWorkServiceResponse;
+    200: GetWorkServiceResponse;
 };
 
 export type CreateResponse = CreateResponses[keyof CreateResponses];
@@ -714,21 +722,21 @@ export type CreateMechanic1Responses = {
 
 export type CreateMechanic1Response = CreateMechanic1Responses[keyof CreateMechanic1Responses];
 
-export type GetAll1Data = {
+export type GetAllData = {
     body?: never;
     path?: never;
     query?: never;
     url: '/api/work-orders';
 };
 
-export type GetAll1Responses = {
+export type GetAllResponses = {
     /**
      * OK
      */
     200: Array<CreateWorkOrderResponse>;
 };
 
-export type GetAll1Response = GetAll1Responses[keyof GetAll1Responses];
+export type GetAllResponse = GetAllResponses[keyof GetAllResponses];
 
 export type GetInteriorConditionsData = {
     body?: never;

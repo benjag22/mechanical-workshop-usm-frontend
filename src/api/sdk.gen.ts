@@ -2,7 +2,7 @@
 
 import { type Client, formDataBodySerializer, type Options as Options2, type TDataShape } from './client';
 import { client } from './client.gen';
-import type { CreateCarData, CreateCarModelData, CreateCarModelResponses, CreateCarResponses, CreateCheckInData, CreateCheckInResponses, CreateClientData, CreateClientResponses, CreateData, CreateErrors, CreateFullData, CreateFullResponses, CreateMechanic1Data, CreateMechanic1Responses, CreateMechanicalConditionData, CreateMechanicalConditionResponses, CreateMechanicData, CreateMechanicResponses, CreateResponses, CreateToolData, CreateToolResponses, GetAll1Data, GetAll1Responses, GetAllCarBrandsData, GetAllCarBrandsResponses, GetAllCarModelsData, GetAllCarModelsResponses, GetAllCarsData, GetAllCarsResponses, GetAllCheckInFullData, GetAllCheckInFullResponses, GetAllClientsData, GetAllClientsResponses, GetAllData, GetAllMechanicsData, GetAllMechanicsResponses, GetAllPatentsData, GetAllPatentsResponses, GetAllResponses, GetAllToolsData, GetAllToolsResponses, GetCarFullByIdData, GetCarFullByIdResponses, GetCarFullByPatentData, GetCarFullByPatentResponses, GetCarModelData, GetCarModelResponses, GetCheckInFullData, GetCheckInFullResponses, GetElectricalConditionsData, GetElectricalConditionsResponses, GetExteriorConditionsData, GetExteriorConditionsResponses, GetImageCategoryData, GetImageCategoryResponses, GetInteriorConditionsData, GetInteriorConditionsResponses } from './types.gen';
+import type { CreateCarData, CreateCarModelData, CreateCarModelResponses, CreateCarResponses, CreateCheckInData, CreateCheckInResponses, CreateClientData, CreateClientResponses, CreateData, CreateErrors, CreateFullData, CreateFullResponses, CreateMechanic1Data, CreateMechanic1Responses, CreateMechanicalConditionData, CreateMechanicalConditionResponses, CreateMechanicData, CreateMechanicResponses, CreateResponses, CreateToolData, CreateToolResponses, GetAllCarBrandsData, GetAllCarBrandsResponses, GetAllCarModelsData, GetAllCarModelsResponses, GetAllCarsData, GetAllCarsResponses, GetAllCheckInFullData, GetAllCheckInFullResponses, GetAllClientsData, GetAllClientsResponses, GetAllData, GetAllMechanicsData, GetAllMechanicsResponses, GetAllPatentsData, GetAllPatentsResponses, GetAllResponses, GetAllToolsData, GetAllToolsResponses, GetAllWorkServicesData, GetAllWorkServicesResponses, GetCarFullByIdData, GetCarFullByIdResponses, GetCarFullByPatentData, GetCarFullByPatentResponses, GetCarModelData, GetCarModelResponses, GetCheckInFullData, GetCheckInFullResponses, GetElectricalConditionsData, GetElectricalConditionsResponses, GetExteriorConditionsData, GetExteriorConditionsResponses, GetImageCategoryData, GetImageCategoryResponses, GetInteriorConditionsData, GetInteriorConditionsResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
@@ -23,8 +23,8 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
  *
  * Returns a list of all existing work services.
  */
-export const getAll = <ThrowOnError extends boolean = false>(options?: Options<GetAllData, ThrowOnError>) => {
-    return (options?.client ?? client).get<GetAllResponses, unknown, ThrowOnError>({
+export const getAllWorkServices = <ThrowOnError extends boolean = false>(options?: Options<GetAllWorkServicesData, ThrowOnError>) => {
+    return (options?.client ?? client).get<GetAllWorkServicesResponses, unknown, ThrowOnError>({
         url: '/api/work-services',
         ...options
     });
@@ -205,8 +205,8 @@ export const createMechanic1 = <ThrowOnError extends boolean = false>(options: O
  *
  * Returns a list of all work orders.
  */
-export const getAll1 = <ThrowOnError extends boolean = false>(options?: Options<GetAll1Data, ThrowOnError>) => {
-    return (options?.client ?? client).get<GetAll1Responses, unknown, ThrowOnError>({
+export const getAll = <ThrowOnError extends boolean = false>(options?: Options<GetAllData, ThrowOnError>) => {
+    return (options?.client ?? client).get<GetAllResponses, unknown, ThrowOnError>({
         url: '/api/work-orders',
         ...options
     });

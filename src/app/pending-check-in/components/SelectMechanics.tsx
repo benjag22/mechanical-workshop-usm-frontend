@@ -2,20 +2,20 @@
 
 import { useState, useEffect } from 'react'
 import { cn } from '@/app/cn'
-import api, { Mechanic } from "@/api"
+import api, { Mechanic , CreateMechanicRequest} from "@/api"
 
-// Tipo extendido para uso interno del componente
 type MechanicSelection = Mechanic & {
   isLeader: boolean
   isExisting: boolean
 }
 
 type Props = {
-  onMechanicsChange?: (mechanics: {
-    existingIds: number[],
-    newMechanics: { name: string, rut: string }[],
-    leaderId?: number
-  }) => void;
+  onMechanicsChange: (
+    mechanicIds: number[],
+    newMechanics: CreateMechanicRequest[],
+    newLeaderMechanic?: CreateMechanicRequest,
+    leaderMechanicId?: number
+  ) => void;
 }
 
 export default function SelectMechanics({ onMechanicsChange }: Props) {
@@ -38,7 +38,7 @@ export default function SelectMechanics({ onMechanicsChange }: Props) {
           setAvailableMechanics([])
         }
       } catch (error) {
-        console.error('Error loading mechanics:', error)
+        console.error(error)
         setAvailableMechanics([])
       } finally {
         setIsLoadingMechanics(false)
@@ -49,21 +49,33 @@ export default function SelectMechanics({ onMechanicsChange }: Props) {
 
   useEffect(() => {
     if (onMechanicsChange) {
-      const existingIds = selectedMechanics
-        .filter(m => m.isExisting)
+      const mechanicIds = selectedMechanics
+        .filter(m => m.isExisting && !m.isLeader)
         .map(m => m.id)
 
       const newMechanics = selectedMechanics
-        .filter(m => !m.isExisting)
+        .filter(m => !m.isExisting && !m.isLeader)
         .map(m => ({ name: m.name, rut: m.rut }))
 
       const leader = selectedMechanics.find(m => m.isLeader)
 
-      onMechanicsChange({
-        existingIds,
+      let newLeaderMechanic: CreateMechanicRequest | undefined
+      let leaderMechanicId: number | undefined
+
+      if (leader) {
+        if (leader.isExisting) {
+          leaderMechanicId = leader.id
+        } else {
+          newLeaderMechanic = { name: leader.name, rut: leader.rut }
+        }
+      }
+
+      onMechanicsChange(
+        mechanicIds,
         newMechanics,
-        leaderId: leader?.isExisting ? leader.id : undefined
-      })
+        newLeaderMechanic,
+        leaderMechanicId
+      )
     }
   }, [selectedMechanics, onMechanicsChange])
 

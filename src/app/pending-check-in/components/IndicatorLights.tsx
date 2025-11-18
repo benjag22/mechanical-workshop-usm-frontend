@@ -1,9 +1,6 @@
-'use client'
-
 import Image from "next/image";
 import { cn } from "@/app/cn";
-import { useEffect, useState } from "react";
-import api, { CreateImageRequest, CreateWorkOrderHasDashboardLightRequest } from "@/api";
+import { CreateImageRequest } from "@/api";
 
 type LightData = CreateImageRequest & {
   present: boolean;
@@ -74,7 +71,6 @@ export default function IndicatorLights({ lightsData, onLightChange }: Indicator
             </div>
           </div>
 
-          {/* ¿Está presente? */}
           <div className="mb-4">
             <p className="text-slate-300 text-sm mb-3 font-medium">¿Está presente?</p>
             <div className="flex gap-3">
@@ -115,7 +111,6 @@ export default function IndicatorLights({ lightsData, onLightChange }: Indicator
             </div>
           </div>
 
-          {/* ¿Funciona correctamente? */}
           {light.present && (
             <div className="animate-in fade-in-50 slide-in-from-top-2 duration-300">
               <p className="text-slate-300 text-sm mb-3 font-medium">¿Funciona correctamente?</p>
@@ -158,7 +153,6 @@ export default function IndicatorLights({ lightsData, onLightChange }: Indicator
             </div>
           )}
 
-          {/* Estado sin evaluar */}
           {!light.present && (
             <div className="flex items-center gap-2 mt-4 px-3 py-2 bg-slate-600/30 rounded-lg">
               <div className="w-2 h-2 bg-slate-400 rounded-full animate-pulse"></div>
