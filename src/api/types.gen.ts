@@ -25,7 +25,7 @@ export type CreateWorkServiceRequest = {
      */
     serviceName: string;
     /**
-     * Tiempo estimado en formato HH:mm
+     * Tiempo estimado en formato HH:mm o HH:mm:ss
      */
     estimatedTime: string;
 };

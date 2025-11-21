@@ -46,7 +46,7 @@ export default function SummaryIndicatorLights({ onLightsChange }: Props) {
       const workOrderLights: CreateWorkOrderHasDashboardLightRequest[] = lightsData.map(light => ({
         dashboardLightId: light.id,
         present: light.present,
-        is_functional: light.is_functional
+        isFunctional: light.is_functional
       }));
       onLightsChange(workOrderLights);
     }
@@ -144,7 +144,6 @@ export default function SummaryIndicatorLights({ onLightsChange }: Props) {
                   </div>
                 </div>
 
-                {/* Progreso visual */}
                 <div className="mt-6 space-y-3">
                   <div className="text-xs text-slate-400 mb-2">Progreso de evaluación</div>
                   <div className="w-full bg-slate-600/50 rounded-full h-2">
@@ -158,7 +157,6 @@ export default function SummaryIndicatorLights({ onLightsChange }: Props) {
                   </div>
                 </div>
 
-                {/* Leyenda */}
                 <div className="mt-6 pt-6 border-t border-slate-600/30 space-y-2">
                   <div className="text-xs text-slate-400 mb-3">Leyenda</div>
                   <div className="flex items-center gap-2">

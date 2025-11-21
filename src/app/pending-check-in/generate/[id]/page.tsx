@@ -1,18 +1,24 @@
 'use client'
+
 import {ReactNode, use, useCallback, useState} from 'react'
 import {cn} from "@/app/cn"
 import DrawableCanvas from "@/app/components/DrawableCanvas"
 import ImageGallery, {ImageFile} from "@/app/components/ImageGallery"
-import SelectServices from "@/app/pending-check-in/components/SelectServices";
-import SummaryIndicatorLights from "@/app/pending-check-in/components/SummaryIndicatorLights";
+import SelectServices from "@/app/pending-check-in/components/SelectServices"
+import SummaryIndicatorLights from "@/app/pending-check-in/components/SummaryIndicatorLights"
 import SelectMechanics from "@/app/pending-check-in/components/SelectMechanics"
+import LoadingSpinner from "@/app/components/LoadingSpinner"
+import SuccessMessage from "@/app/components/SuccessMessage"
+import ErrorDisplay from "@/app/components/ErrorDisplay"
 import api, {
   CreateMechanicRequest,
   CreateWorkOrderHasDashboardLightRequest,
   CreateWorkOrderRequest,
   CreateWorkServiceRequest
 } from "@/api"
-import {produce} from "immer";
+import {produce} from "immer"
+import {parseApiError, ParsedError} from "@/util/errorParser"
+import {useRouter} from "next/navigation"
 
 type Section = {
   index: number
@@ -22,21 +28,27 @@ type Section = {
 
 export default function GenerateByIdCheckIn({params}: { params: Promise<{ id: number }> }) {
   const {id} = use(params)
+  const router = useRouter()
   const [nSections, setNSections] = useState<number>(0)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [error, setError] = useState<ParsedError | null>(null)
+  const [showSuccess, setShowSuccess] = useState(false)
+  const [formKey, setFormKey] = useState(0)
 
   const [signature, setSignature] = useState<File | null>(null)
   const [carImages, setCarImages] = useState<ImageFile[]>([])
-  const [request, setRequest] = useState<CreateWorkOrderRequest>({
-    recordId: id,
+
+  const initialRequest: CreateWorkOrderRequest = {
+    recordId: +id,
     mechanicIds: [],
     newMechanics: []
-  })
+  }
+
+  const [request, setRequest] = useState<CreateWorkOrderRequest>(initialRequest)
 
   const validateForm = (): { isValid: boolean; errors: string[] } => {
     const errors: string[] = []
 
-    // Validar mecánicos
     const hasMechanics = (request.mechanicIds && request.mechanicIds.length > 0) ||
       (request.newMechanics && request.newMechanics.length > 0)
     const hasLeader = request.leaderMechanicId || request.newLeaderMechanic
@@ -45,7 +57,6 @@ export default function GenerateByIdCheckIn({params}: { params: Promise<{ id: nu
       errors.push('Debes seleccionar al menos un mecánico')
     }
 
-    // Validar servicios
     const hasServices = (request.serviceIds && request.serviceIds.length > 0) ||
       (request.newServices && request.newServices.length > 0)
 
@@ -53,12 +64,10 @@ export default function GenerateByIdCheckIn({params}: { params: Promise<{ id: nu
       errors.push('Debes seleccionar al menos un servicio')
     }
 
-    // Validar firma
     if (!signature) {
       errors.push('Debes firmar antes de finalizar')
     }
 
-    // Validar imágenes (opcional, puedes eliminar si no son obligatorias)
     if (carImages.length === 0) {
       errors.push('Debes agregar al menos una imagen del vehículo')
     }
@@ -70,10 +79,20 @@ export default function GenerateByIdCheckIn({params}: { params: Promise<{ id: nu
   }
 
   async function sendData() {
+    setIsSubmitting(true)
+    setError(null)
+
     try {
-      setIsSubmitting(true)
       const validation = validateForm()
+
       if (!validation.isValid) {
+        setError({
+          message: "Por favor completa todos los campos requeridos",
+          fieldErrors: validation.errors.map(err => ({
+            field: "Validación",
+            message: err
+          }))
+        })
         return
       }
 
@@ -83,16 +102,27 @@ export default function GenerateByIdCheckIn({params}: { params: Promise<{ id: nu
         signature: signature ? signature : new File([], "signature"),
       }
 
-      console.log(payload)
-
       const response = await api.createFull({body: payload})
-      console.log(response)
-    } catch (error) {
-      console.error(error)
+
+      if (response.data) {
+        setShowSuccess(true)
+      } else if (response.error) {
+        const parsedError = parseApiError(response.error, "Error al crear la orden de trabajo")
+        setError(parsedError)
+      }
+    } catch (err) {
+      const parsedError = parseApiError(err, "Error inesperado al crear la orden de trabajo")
+      setError(parsedError)
     } finally {
       setIsSubmitting(false)
     }
   }
+
+
+  const handleSuccessClose = useCallback(() => {
+    setShowSuccess(false)
+    router.push('/pending-check-in')
+  }, [router])
 
   const handleMechanicData = useCallback((
     mechanicIds: number[],
@@ -106,7 +136,7 @@ export default function GenerateByIdCheckIn({params}: { params: Promise<{ id: nu
       draft.mechanicIds = mechanicIds
       draft.newMechanics = newMechanics
     }))
-  }, []);
+  }, [])
 
   const handleServices = useCallback((
     serviceIds: number[],
@@ -137,24 +167,25 @@ export default function GenerateByIdCheckIn({params}: { params: Promise<{ id: nu
   const sections: Section[] = [
     {
       index: 0,
-      name: "Mechanics to work",
-      children: <SelectMechanics onMechanicsChange={handleMechanicData} />
+      name: "Mecánicos asignados",
+      children: <SelectMechanics key={`mechanics-${formKey}`} onMechanicsChange={handleMechanicData} />
     },
     {
       index: 1,
-      name: "Lights Indicators",
-      children: <SummaryIndicatorLights onLightsChange={handleLightsData}/>
+      name: "Luces indicadoras",
+      children: <SummaryIndicatorLights key={`lights-${formKey}`} onLightsChange={handleLightsData}/>
     },
     {
       index: 2,
-      name: "Services",
-      children: <SelectServices onServicesChange={handleServices}/>
+      name: "Servicios",
+      children: <SelectServices key={`services-${formKey}`} onServicesChange={handleServices}/>
     },
     {
       index: 3,
-      name: "Car condition",
+      name: "Condición del vehículo",
       children: (
         <ImageGallery
+          key={`images-${formKey}`}
           onImagesChange={handleImagesChange}
           maxImages={15}
           maxFileSize={10}
@@ -164,9 +195,10 @@ export default function GenerateByIdCheckIn({params}: { params: Promise<{ id: nu
     },
     {
       index: 4,
-      name: "Client Signature",
+      name: "Firma del cliente",
       children: (
         <DrawableCanvas
+          key={`signature-${formKey}`}
           width={1000}
           height={600}
           strokeColor="#000000"
@@ -185,13 +217,15 @@ export default function GenerateByIdCheckIn({params}: { params: Promise<{ id: nu
   }
 
   const StepIndicator = ({section, index}: { section: Section, index: number }) => (
-    <div key={section.index} className="flex items-center">
+    <div key={section.index} className="flex items-center flex-shrink-0">
       <div className={cn(
         "flex items-center justify-center w-10 h-10 rounded-full",
         "transition-all duration-300 ease-in-out text-sm font-semibold",
-        nSections === section.index ? "bg-blue-600 text-white shadow-lg ring-2" : "",
-        nSections > section.index ? "bg-emerald-500 text-white shadow-md" : "",
-        nSections < section.index ? "bg-slate-300 text-slate-600" : ""
+        nSections === section.index
+          ? "bg-blue-600 text-white shadow-lg ring-2 ring-blue-400"
+          : nSections > section.index
+            ? "bg-emerald-600 text-white"
+            : "bg-slate-600 text-slate-300"
       )}>
         {nSections > section.index ? (
           <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -206,8 +240,8 @@ export default function GenerateByIdCheckIn({params}: { params: Promise<{ id: nu
 
       {index < sections.length - 1 && (
         <div className={cn(
-          "w-10 lg:w-18 md:w-14 h-1 mx-3 rounded-full transition-all duration-300",
-          nSections > section.index ? "bg-emerald-400" : "bg-slate-300"
+          "w-12 h-0.5 mx-2 transition-all duration-300 rounded-full",
+          nSections > section.index ? "bg-emerald-600" : "bg-slate-600"
         )}/>
       )}
     </div>
@@ -225,9 +259,9 @@ export default function GenerateByIdCheckIn({params}: { params: Promise<{ id: nu
     children: ReactNode
   }) => {
     const variants = {
-      primary: "bg-blue-700 hover:bg-blue-800 text-white shadow-lg hover:shadow-xl",
-      secondary: "bg-red-400 hover:bg-red-500 text-black shadow-md hover:shadow-lg",
-      success: "bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg hover:shadow-xl"
+      primary: "bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg",
+      secondary: "bg-slate-600 hover:bg-slate-700 text-white shadow-sm hover:shadow-md",
+      success: "bg-emerald-600 hover:bg-emerald-700 text-white shadow-md hover:shadow-lg"
     }
 
     return (
@@ -235,9 +269,10 @@ export default function GenerateByIdCheckIn({params}: { params: Promise<{ id: nu
         onClick={onClick}
         disabled={disabled}
         className={cn(
-          "px-8 py-3 rounded-lg font-medium text-sm",
-          "transition-all duration-200 ease-in-out transform hover:scale-[1.01]",
-          "disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none",
+          "px-6 py-2.5 rounded-lg font-medium text-sm",
+          "transition-all duration-200 ease-in-out",
+          "disabled:opacity-50 disabled:cursor-not-allowed",
+          "flex items-center gap-2",
           variants[variant]
         )}
       >
@@ -247,41 +282,82 @@ export default function GenerateByIdCheckIn({params}: { params: Promise<{ id: nu
   }
 
   return (
-    <div className="w-full h-full bg-gradient-to-br from-slate-800 via-slate-700 to-slate-500 p-6">
-      <div className="w-full mx-auto">
-        <div className="text-center mb-2">
-          <h1 className="text-white text-3xl font-bold mb-2">
-            Orden de Trabajo
-          </h1>
-        </div>
+    <>
+      {isSubmitting && (
+        <LoadingSpinner
+          title="Creando orden de trabajo..."
+          subtitle="Por favor espere"
+        />
+      )}
 
-        <div className="bg-slate-600/20 backdrop-blur-sm rounded-2xl p-8 mb-4 border border-slate-500/30">
-          <div className="flex items-center justify-center mb-2">
+      <ErrorDisplay
+        error={error}
+        onClose={() => setError(null)}
+      />
+
+      {showSuccess && (
+        <SuccessMessage
+          onClose={handleSuccessClose}
+          title="¡Orden de trabajo creada!"
+          message="La orden de trabajo se ha creado exitosamente"
+          buttonText="Volver a check-ins pendientes"
+        />
+      )}
+
+      <div className={cn("flex flex-col bg-slate-800 w-full h-screen")}>
+        <div className={cn("flex flex-col px-8 py-6 bg-slate-700/30 border-b border-slate-600/50")}>
+          <div className={cn("text-center mb-4")}>
+            <h1 className={cn("text-white text-3xl font-bold mb-2")}>
+              Generar Orden de Trabajo
+            </h1>
+            <p className={cn("text-slate-400 text-sm")}>
+              Check-in ID: #{id}
+            </p>
+          </div>
+
+          <div className={cn("flex items-center justify-center space-x-3 overflow-x-auto pb-2")}>
             {sections.map((section, index) => (
               <StepIndicator key={section.index} section={section} index={index}/>
             ))}
           </div>
 
-          <div className="text-center">
-            <p className="text-slate-300 text-sm">
+          <div className={cn("flex flex-col items-center justify-center mt-4 space-y-1")}>
+            <p className={cn("text-slate-300 text-sm font-medium")}>
               Paso {nSections + 1} de {sections.length}
+            </p>
+            <p className={cn("text-slate-400 text-xs")}>
+              {sections[nSections].name}
             </p>
           </div>
         </div>
-
-        <div className="bg-gradient-to-br from-slate-800 via-slate-700 to-slate-500 rounded-2xl p-8 shadow-2xl border border-slate-900">
-          <div className="min-h-[400px] flex items-center justify-center mb-4">
-            {sections[nSections].children || (<></>)}
+        <div className={cn("flex-1 bg-slate-700/20 m-3 rounded-lg overflow-hidden")}>
+          <div className={cn("h-full flex flex-col p-4 overflow-y-auto")}>
+            {sections.map((section) => (
+              <div
+                key={section.index}
+                className={cn(
+                  "w-full h-full transition-opacity duration-300",
+                  nSections === section.index ? "block" : "hidden"
+                )}
+              >
+                {section.children || <></>}
+              </div>
+            ))}
           </div>
+        </div>
 
-          <div className="flex justify-center gap-4">
+        <div className={cn("px-8 py-6 bg-slate-700/30 border-t border-slate-600/50")}>
+          <div className={cn("flex items-center justify-center gap-4")}>
             {!isFirstStep && (
               <NavigationButton
                 variant="secondary"
                 onClick={() => navigateStep('prev')}
                 disabled={isSubmitting}
               >
-                ← Atrás
+                <svg className={cn("w-4 h-4")} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+                Atrás
               </NavigationButton>
             )}
 
@@ -291,17 +367,10 @@ export default function GenerateByIdCheckIn({params}: { params: Promise<{ id: nu
                 onClick={sendData}
                 disabled={isSubmitting}
               >
-                {isSubmitting ? (
-                  <span className="flex items-center gap-2">
-                    <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Enviando...
-                  </span>
-                ) : (
-                  '✓ Finalizar'
-                )}
+                <svg className={cn("w-4 h-4")} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                Finalizar y crear orden
               </NavigationButton>
             ) : (
               <NavigationButton
@@ -309,12 +378,15 @@ export default function GenerateByIdCheckIn({params}: { params: Promise<{ id: nu
                 onClick={() => navigateStep('next')}
                 disabled={isSubmitting}
               >
-                Siguiente →
+                Siguiente
+                <svg className={cn("w-4 h-4")} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
               </NavigationButton>
             )}
           </div>
         </div>
       </div>
-    </div>
+    </>
   )
 }
