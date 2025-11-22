@@ -1,142 +1,195 @@
-import {use} from "react";
 import {cn} from "@/app/cn";
-import CarDetailCard from "@/app/work-orders/detail/components/CarDetail";
-import ClientInfoCard from "@/app/work-orders/detail/components/ClientInfoCard";
-import ServicesChecklistCard from "@/app/work-orders/detail/components/ServicesChecklistCard";
-import VehiclePhotosCard from "@/app/work-orders/detail/components/VehiclePhotosCard";
-import DashboardLightsCard from "@/app/work-orders/detail/components/DashboardLightsCard";
-import MechanicsCard from "@/app/work-orders/detail/components/MechanicsCard";
+import api from "@/api"
+import PreviewWorkOrder from "@/app/work-orders/components/PreviewWorkOrder";
 
-type Car = {
-  pattern: string;
-  kms: number;
-  model: string;
-  brand: string;
-}
-
-type ClientInfo = {
-  firstName: string;
-  lastName: string;
-  email: string;
-  phoneNumber: string;
-  address: string;
-}
-
-type Service = {
-  name: string;
-  time: number; // hours
-  completed?: boolean;
-}
-
-type DetailWorkOrder = {
-  id: number;
-  checkInObservations: string;
-  tableLights: Array<string>; // url's a los svg
-  carPhotos: Array<string>; //url's a las imagenes sacadas del auto
-  services: Array<Service>;
-  mechanics: Array<string>;
-  user: ClientInfo;
-  carDetail: Car;
-}
-
-const mockWorkOrder: DetailWorkOrder = {
-  id: 1,
-  checkInObservations: "Cliente solicita revisión general y cambio de aceite. Se reporta ruido en el freno delantero derecho.",
-  tableLights: [
-    "/icons/check-engine.svg",
-    "/icons/oil-pressure.svg",
-    "/icons/brake-warning.svg"
-  ],
-  carPhotos: [
-    "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=400",
-    "https://images.unsplash.com/photo-1542362567-b07e54358753?w=400",
-    "https://images.unsplash.com/photo-1617531653332-bd46c24f2068?w=400",
-    "https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?w=400"
-  ],
-  services: [
-    { name: "Cambio de aceite y filtro", time: 1, completed: true },
-    { name: "Revisión de frenos", time: 2, completed: true },
-    { name: "Rotación de neumáticos", time: 1, completed: false },
-    { name: "Revisión de suspensión", time: 1.5, completed: false },
-    { name: "Cambio de pastillas de freno", time: 2, completed: false }
-  ],
-  mechanics: ["Juan Pérez", "Carlos Ruiz"],
-  user: {
-    firstName: "María",
-    lastName: "González",
-    email: "maria.gonzalez@email.com",
-    phoneNumber: "+56 9 1234 5678",
-    address: "Av. Principal 123, Santiago"
-  },
-  carDetail: {
-    pattern: "ABC-123",
-    kms: 45000,
-    model: "Corolla",
-    brand: "Toyota"
+async function getAllWorkOrders() {
+  try {
+    const response = await api.getAllWorkOrders();
+    return response.data || [];
+  } catch (error) {
+    console.error('Error al obtener las órdenes de trabajo:', error);
+    return [];
   }
-};
+}
 
-export default function WorkOrderDetail({params}: { params: Promise<{ id: number }> }) {
-  const {id} = use(params);
+export default async function WorkOrdersPage() {
+  const workOrders = await getAllWorkOrders();
 
-  const workOrder = mockWorkOrder;
-  const photos = [
-    { id: 1, label: "Frontal" },
-    { id: 2, label: "Lateral Izquierdo" },
-    { id: 3, label: "Interior" },
-    { id: 4, label: "Motor" },
-  ];
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
-      <div className="bg-white border-b border-slate-200 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-slate-900">
-                Orden de Trabajo #{workOrder.id}
-              </h1>
-              <p className="text-slate-600 mt-1">
-                {workOrder.carDetail.brand} {workOrder.carDetail.model} - {workOrder.carDetail.pattern}
-              </p>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 py-8 px-4">
+      <div className="max-w-7xl mx-auto">
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold text-white mb-2">
+            Órdenes de Trabajo
+          </h1>
+          <p className="text-slate-400">
+            Gestiona y visualiza todas las órdenes de trabajo del taller
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+          <div className="bg-slate-700/50 backdrop-blur-sm rounded-xl p-6 border border-slate-600/50 shadow-lg">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-slate-400 text-sm">Total de Órdenes</p>
+                <p className="text-3xl font-bold text-white mt-1">
+                  {workOrders.length}
+                </p>
+              </div>
+              <div className="w-12 h-12 rounded-full bg-blue-500/20 flex items-center justify-center">
+                <svg className="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
+              </div>
             </div>
-            <div className="flex gap-3">
-              <button className={cn(
-                "px-4 py-2 rounded-lg font-medium",
-                "bg-blue-600 text-white",
-                "hover:bg-blue-700 transition-colors"
-              )}>
-                Completar Orden
-              </button>
+          </div>
+
+          <div className="bg-slate-700/50 backdrop-blur-sm rounded-xl p-6 border border-slate-600/50 shadow-lg">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-slate-400 text-sm">En Progreso</p>
+                <p className="text-3xl font-bold text-amber-400 mt-1">
+                  {workOrders.filter(wo => !wo.isCompleted).length}
+                </p>
+              </div>
+              <div className="w-12 h-12 rounded-full bg-amber-500/20 flex items-center justify-center">
+                <svg className="w-6 h-6 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-slate-700/50 backdrop-blur-sm rounded-xl p-6 border border-slate-600/50 shadow-lg">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-slate-400 text-sm">Completadas</p>
+                <p className="text-3xl font-bold text-green-400 mt-1">
+                  {workOrders.filter(wo => wo.isCompleted).length}
+                </p>
+              </div>
+              <div className="w-12 h-12 rounded-full bg-green-500/20 flex items-center justify-center">
+                <svg className="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <ClientInfoCard client={workOrder.user} />
-              <CarDetailCard car={workOrder.carDetail} />
+        <div className="bg-slate-700/50 backdrop-blur-sm rounded-xl p-4 border border-slate-600/50 shadow-lg mb-6">
+          <div className="flex flex-wrap items-center gap-4">
+            <div className="flex items-center gap-2">
+              <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                      d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+              </svg>
+              <span className="text-slate-300 font-medium">Filtros:</span>
             </div>
 
-            <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
-              <h3 className="text-lg font-semibold text-slate-900 mb-3">
-                Observaciones de Ingreso
-              </h3>
-              <p className="text-slate-700 leading-relaxed">
-                {workOrder.checkInObservations}
-              </p>
-            </div>
-            <ServicesChecklistCard services={workOrder.services} />
-            <VehiclePhotosCard photos={photos} />
-          </div>
+            <button className={cn(
+              "px-4 py-2 rounded-lg text-sm font-medium transition-all",
+              "bg-blue-600 text-white"
+            )}>
+              Todas ({workOrders.length})
+            </button>
 
-          <div className="space-y-6">
-            <MechanicsCard mechanics={workOrder.mechanics} />
-            <DashboardLightsCard lights={workOrder.tableLights} />
+            <button className={cn(
+              "px-4 py-2 rounded-lg text-sm font-medium transition-all",
+              "bg-slate-600/50 text-slate-300 hover:bg-slate-600"
+            )}>
+              En Progreso ({workOrders.filter(wo => !wo.isCompleted).length})
+            </button>
+
+            <button className={cn(
+              "px-4 py-2 rounded-lg text-sm font-medium transition-all",
+              "bg-slate-600/50 text-slate-300 hover:bg-slate-600"
+            )}>
+              Completadas ({workOrders.filter(wo => wo.isCompleted).length})
+            </button>
           </div>
         </div>
+
+        {workOrders.length === 0 ? (
+          <div className="bg-slate-700/30 backdrop-blur-sm rounded-xl p-12 border border-slate-600/30 text-center">
+            <svg className="w-20 h-20 mx-auto text-slate-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+            </svg>
+            <h3 className="text-xl font-semibold text-slate-300 mb-2">
+              No hay órdenes de trabajo
+            </h3>
+            <p className="text-slate-400 mb-6">
+              Comienza creando tu primera orden de trabajo
+            </p>
+            <a
+              href="/work-orders/create"
+              className={cn(
+                "inline-flex items-center gap-2 px-6 py-3 rounded-lg font-medium",
+                "bg-blue-600 hover:bg-blue-700 text-white",
+                "transition-all duration-200 transform hover:scale-105",
+                "shadow-lg hover:shadow-xl"
+              )}
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+              Crear Orden de Trabajo
+            </a>
+          </div>
+        ) : (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {workOrders.map((workOrder) => (
+                <PreviewWorkOrder
+                  key={workOrder.id}
+                  {...workOrder}
+                />
+              ))}
+            </div>
+
+            {workOrders.length > 9 && (
+              <div className="mt-8 flex justify-center">
+                <div className="bg-slate-700/50 backdrop-blur-sm rounded-xl border border-slate-600/50 shadow-lg p-2 flex items-center gap-2">
+                  <button className={cn(
+                    "p-2 rounded-lg transition-all",
+                    "bg-slate-600 hover:bg-slate-500 text-white"
+                  )}>
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                    </svg>
+                  </button>
+
+                  {[1, 2, 3].map((page) => (
+                    <button
+                      key={page}
+                      className={cn(
+                        "px-4 py-2 rounded-lg font-medium transition-all",
+                        page === 1
+                          ? "bg-blue-600 text-white"
+                          : "bg-slate-600/50 text-slate-300 hover:bg-slate-600"
+                      )}
+                    >
+                      {page}
+                    </button>
+                  ))}
+
+                  <button className={cn(
+                    "p-2 rounded-lg transition-all",
+                    "bg-slate-600 hover:bg-slate-500 text-white"
+                  )}>
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            )}
+          </>
+        )}
       </div>
     </div>
   );

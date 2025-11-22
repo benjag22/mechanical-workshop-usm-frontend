@@ -243,7 +243,8 @@ export type CreateCarBrandResponse = {
 export type TrimmedWorkOrder = {
     id: number;
     isCompleted: boolean;
-    estimatedTime: string;
+    createdAt: string;
+    deliveryTime: string;
     signatureUrl: string;
     mechanicLeaderFullName: string;
     clientFirstName: string;
