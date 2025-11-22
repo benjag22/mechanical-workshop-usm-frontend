@@ -240,6 +240,25 @@ export type CreateCarBrandResponse = {
     registration_number?: string;
 };
 
+export type CreateWorkOrderRealizedServiceResponse = {
+    /**
+     * ID del registro
+     */
+    id?: number;
+    /**
+     * ID del work order asociado
+     */
+    workOrderId?: number;
+    /**
+     * ID del work service asociado
+     */
+    workServiceId?: number;
+    /**
+     * Si el servicio está finalizado
+     */
+    finalized?: boolean;
+};
+
 export type TrimmedWorkOrder = {
     id: number;
     isCompleted: boolean;
@@ -288,17 +307,36 @@ export type GetMechanicWorkOrder = {
     isLeader: boolean;
 };
 
+export type GetServiceState = {
+    /**
+     * Service ID
+     */
+    id: number;
+    /**
+     * Service name
+     */
+    name: string;
+    /**
+     * Estimated time in HH:mm[:ss] format
+     */
+    estimatedTime: string;
+    /**
+     * If the service is completed
+     */
+    finalized: boolean;
+};
+
 export type GetWorkOrderFull = {
-    id?: number;
-    createdAt?: string;
-    estimatedDelivery?: string;
-    services?: Array<GetService>;
-    mechanics?: Array<GetMechanicWorkOrder>;
-    signatureUrl?: string;
-    carImages?: Array<GetImage>;
+    id: number;
+    createdAt: string;
+    estimatedDelivery: string;
+    services: Array<GetServiceState>;
+    mechanics: Array<GetMechanicWorkOrder>;
+    signatureUrl: string;
+    carImages: Array<GetImage>;
     dashboardLights?: Array<GetWorkOrderHasDashboardLight>;
-    customer?: Client;
-    vehicle?: GetCar;
+    customer: Client;
+    vehicle: GetCar;
 };
 
 export type GetWorkOrderHasDashboardLight = {
@@ -763,6 +801,24 @@ export type CreateMechanic1Responses = {
 
 export type CreateMechanic1Response = CreateMechanic1Responses[keyof CreateMechanic1Responses];
 
+export type ToggleRealizedServicesFinalizedData = {
+    body: Array<number>;
+    path: {
+        workOrderId: number;
+    };
+    query?: never;
+    url: '/api/work-orders/{workOrderId}/realized-services/toggle';
+};
+
+export type ToggleRealizedServicesFinalizedResponses = {
+    /**
+     * OK
+     */
+    200: Array<CreateWorkOrderRealizedServiceResponse>;
+};
+
+export type ToggleRealizedServicesFinalizedResponse = ToggleRealizedServicesFinalizedResponses[keyof ToggleRealizedServicesFinalizedResponses];
+
 export type GetAllWorkOrdersData = {
     body?: never;
     path?: never;
@@ -799,6 +855,25 @@ export type GetWorkOrderFullByIdResponses = {
 };
 
 export type GetWorkOrderFullByIdResponse = GetWorkOrderFullByIdResponses[keyof GetWorkOrderFullByIdResponses];
+
+export type IsAuthorizedData = {
+    body?: never;
+    path: {
+        id: number;
+        rut: string;
+    };
+    query?: never;
+    url: '/api/work-orders/{id}/authorized/{rut}';
+};
+
+export type IsAuthorizedResponses = {
+    /**
+     * OK
+     */
+    200: boolean;
+};
+
+export type IsAuthorizedResponse = IsAuthorizedResponses[keyof IsAuthorizedResponses];
 
 export type GetInteriorConditionsData = {
     body?: never;
