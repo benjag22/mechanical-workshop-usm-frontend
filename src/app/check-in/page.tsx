@@ -6,7 +6,7 @@ import ClientInfoDetailComponent from "@/app/check-in/components/ClientInfoDetai
 import PatentListComponent from "@/app/check-in/components/PatentListComponent";
 import ListOfConditionsByType from "@/app/check-in/components/ListOfConditionsByType";
 import SelectToolsComponent from "@/app/check-in/components/SelectToolsComponent";
-import api, {CreateCheckInRequest, CreateClientRequest } from "@/api";
+import api, {Client, CreateCheckInRequest, CreateClientRequest} from "@/api";
 import {produce} from "immer";
 import ErrorDisplay from "@/app/components/ErrorDisplay";
 import LoadingSpinner from "@/app/components/LoadingSpinner";
@@ -40,11 +40,20 @@ export default function CheckInPage() {
 
   const [checkInRequest, setCheckInRequest] = useState<CreateCheckInRequest>(initialCheckInRequest);
 
-  const handleClientData = useCallback((clientData: CreateClientRequest) => {
+  const handleNewClientData = useCallback((clientData: CreateClientRequest) => {
     setCheckInRequest(prev =>
       produce(prev, (draft) => {
         draft.client = clientData;
         draft.clientId = undefined;
+      })
+    );
+  }, []);
+
+  const handleExistsClientData = useCallback((clientId:number) => {
+    setCheckInRequest(prev =>
+      produce(prev, (draft) => {
+        draft.client = undefined;
+        draft.clientId = clientId;
       })
     );
   }, []);
@@ -137,7 +146,7 @@ export default function CheckInPage() {
     {
       index: 0,
       name: "Información del Cliente",
-      children: <ClientInfoDetailComponent key={`client-${formKey}`} onClientDataChange={handleClientData} />
+      children: <ClientInfoDetailComponent key={`client-${formKey}`} onClientDataChange={handleNewClientData} onExistingClientSelect={handleExistsClientData} />
     },
     {
       index: 1,

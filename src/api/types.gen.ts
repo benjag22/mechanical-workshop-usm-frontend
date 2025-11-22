@@ -320,16 +320,6 @@ export type GetMechanicInfo = {
     rut: string;
 };
 
-export type ClientInfo = {
-    id?: number;
-    firstName?: string;
-    lastName?: string;
-    emailAddress?: string;
-    address?: string;
-    cellphoneNumber?: string;
-    rut: string;
-};
-
 export type GetCheckInBasicResponse = {
     checkInId: number;
     clientName: string;
@@ -624,7 +614,7 @@ export type GetAllClientsResponses = {
     /**
      * OK
      */
-    200: Array<ClientInfo>;
+    200: Array<Client>;
 };
 
 export type GetAllClientsResponse = GetAllClientsResponses[keyof GetAllClientsResponses];
@@ -645,21 +635,21 @@ export type CreateClientResponses = {
 
 export type CreateClientResponse2 = CreateClientResponses[keyof CreateClientResponses];
 
-export type GetAllCheckInFullData = {
+export type GetAllCheckInBasicData = {
     body?: never;
     path?: never;
     query?: never;
     url: '/api/checkin';
 };
 
-export type GetAllCheckInFullResponses = {
+export type GetAllCheckInBasicResponses = {
     /**
      * OK
      */
     200: Array<GetCheckInBasicResponse>;
 };
 
-export type GetAllCheckInFullResponse = GetAllCheckInFullResponses[keyof GetAllCheckInFullResponses];
+export type GetAllCheckInBasicResponse = GetAllCheckInBasicResponses[keyof GetAllCheckInBasicResponses];
 
 export type CreateCheckInData = {
     body: CreateCheckInRequest;
@@ -891,6 +881,22 @@ export type GetCheckInFullResponses = {
 };
 
 export type GetCheckInFullResponse2 = GetCheckInFullResponses[keyof GetCheckInFullResponses];
+
+export type GetPendingCheckInBasicData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/checkin/pending';
+};
+
+export type GetPendingCheckInBasicResponses = {
+    /**
+     * OK
+     */
+    200: Array<GetCheckInBasicResponse>;
+};
+
+export type GetPendingCheckInBasicResponse = GetPendingCheckInBasicResponses[keyof GetPendingCheckInBasicResponses];
 
 export type GetCarFullByIdData = {
     body?: never;

@@ -14,7 +14,7 @@ async function getPendingCheckIns(
   setError: (error: ParsedError) => void
 ): Promise<void> {
   try {
-    const response = await api.getAllCheckInFull()
+    const response = await api.getPendingCheckInBasic()
 
     if (response.data){
       set(response.data)

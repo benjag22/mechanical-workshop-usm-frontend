@@ -2,7 +2,7 @@
 
 import { type Client, formDataBodySerializer, type Options as Options2, type TDataShape } from './client';
 import { client } from './client.gen';
-import type { CreateCarData, CreateCarModelData, CreateCarModelResponses, CreateCarResponses, CreateCheckInData, CreateCheckInResponses, CreateClientData, CreateClientResponses, CreateData, CreateErrors, CreateFullData, CreateFullResponses, CreateMechanic1Data, CreateMechanic1Responses, CreateMechanicalConditionData, CreateMechanicalConditionResponses, CreateMechanicData, CreateMechanicResponses, CreateResponses, CreateToolData, CreateToolResponses, GetAllCarBrandsData, GetAllCarBrandsResponses, GetAllCarModelsData, GetAllCarModelsResponses, GetAllCarsData, GetAllCarsResponses, GetAllCheckInFullData, GetAllCheckInFullResponses, GetAllClientsData, GetAllClientsResponses, GetAllMechanicsData, GetAllMechanicsResponses, GetAllPatentsData, GetAllPatentsResponses, GetAllToolsData, GetAllToolsResponses, GetAllWorkOrdersData, GetAllWorkOrdersResponses, GetAllWorkServicesData, GetAllWorkServicesResponses, GetCarFullByIdData, GetCarFullByIdResponses, GetCarFullByPatentData, GetCarFullByPatentResponses, GetCarModelData, GetCarModelResponses, GetCheckInFullData, GetCheckInFullResponses, GetElectricalConditionsData, GetElectricalConditionsResponses, GetExteriorConditionsData, GetExteriorConditionsResponses, GetImageCategoryData, GetImageCategoryResponses, GetInteriorConditionsData, GetInteriorConditionsResponses, GetWorkOrderFullByIdData, GetWorkOrderFullByIdResponses } from './types.gen';
+import type { CreateCarData, CreateCarModelData, CreateCarModelResponses, CreateCarResponses, CreateCheckInData, CreateCheckInResponses, CreateClientData, CreateClientResponses, CreateData, CreateErrors, CreateFullData, CreateFullResponses, CreateMechanic1Data, CreateMechanic1Responses, CreateMechanicalConditionData, CreateMechanicalConditionResponses, CreateMechanicData, CreateMechanicResponses, CreateResponses, CreateToolData, CreateToolResponses, GetAllCarBrandsData, GetAllCarBrandsResponses, GetAllCarModelsData, GetAllCarModelsResponses, GetAllCarsData, GetAllCarsResponses, GetAllCheckInBasicData, GetAllCheckInBasicResponses, GetAllClientsData, GetAllClientsResponses, GetAllMechanicsData, GetAllMechanicsResponses, GetAllPatentsData, GetAllPatentsResponses, GetAllToolsData, GetAllToolsResponses, GetAllWorkOrdersData, GetAllWorkOrdersResponses, GetAllWorkServicesData, GetAllWorkServicesResponses, GetCarFullByIdData, GetCarFullByIdResponses, GetCarFullByPatentData, GetCarFullByPatentResponses, GetCarModelData, GetCarModelResponses, GetCheckInFullData, GetCheckInFullResponses, GetElectricalConditionsData, GetElectricalConditionsResponses, GetExteriorConditionsData, GetExteriorConditionsResponses, GetImageCategoryData, GetImageCategoryResponses, GetInteriorConditionsData, GetInteriorConditionsResponses, GetPendingCheckInBasicData, GetPendingCheckInBasicResponses, GetWorkOrderFullByIdData, GetWorkOrderFullByIdResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
@@ -128,8 +128,8 @@ export const createClient = <ThrowOnError extends boolean = false>(options: Opti
     });
 };
 
-export const getAllCheckInFull = <ThrowOnError extends boolean = false>(options?: Options<GetAllCheckInFullData, ThrowOnError>) => {
-    return (options?.client ?? client).get<GetAllCheckInFullResponses, unknown, ThrowOnError>({
+export const getAllCheckInBasic = <ThrowOnError extends boolean = false>(options?: Options<GetAllCheckInBasicData, ThrowOnError>) => {
+    return (options?.client ?? client).get<GetAllCheckInBasicResponses, unknown, ThrowOnError>({
         url: '/api/checkin',
         ...options
     });
@@ -255,6 +255,13 @@ export const getImageCategory = <ThrowOnError extends boolean = false>(options?:
 export const getCheckInFull = <ThrowOnError extends boolean = false>(options: Options<GetCheckInFullData, ThrowOnError>) => {
     return (options.client ?? client).get<GetCheckInFullResponses, unknown, ThrowOnError>({
         url: '/api/checkin/{id}/full',
+        ...options
+    });
+};
+
+export const getPendingCheckInBasic = <ThrowOnError extends boolean = false>(options?: Options<GetPendingCheckInBasicData, ThrowOnError>) => {
+    return (options?.client ?? client).get<GetPendingCheckInBasicResponses, unknown, ThrowOnError>({
+        url: '/api/checkin/pending',
         ...options
     });
 };
