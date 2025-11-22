@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from 'react'
 import { cn } from '@/app/cn'
-import api, { Mechanic , CreateMechanicRequest} from "@/api"
+import api, { GetMechanicInfo , CreateMechanicRequest} from "@/api"
 
-type MechanicSelection = Mechanic & {
+type MechanicSelection = GetMechanicInfo & {
   isLeader: boolean
   isExisting: boolean
 }
@@ -19,7 +19,7 @@ type Props = {
 }
 
 export default function SelectMechanics({ onMechanicsChange }: Props) {
-  const [availableMechanics, setAvailableMechanics] = useState<Mechanic[]>([])
+  const [availableMechanics, setAvailableMechanics] = useState<GetMechanicInfo[]>([])
   const [selectedMechanics, setSelectedMechanics] = useState<MechanicSelection[]>([])
   const [newMechanic, setNewMechanic] = useState({ name: '', rut: '' })
   const [errors, setErrors] = useState({ name: '', rut: '' })
@@ -80,38 +80,55 @@ export default function SelectMechanics({ onMechanicsChange }: Props) {
   }, [selectedMechanics, onMechanicsChange])
 
   const validateRut = (rut: string): boolean => {
-    const cleanRut = rut.replace(/\./g, '').replace(/-/g, '')
-    const rutRegex = /^[0-9]{7,8}[0-9Kk]$/
-    return rutRegex.test(cleanRut)
+    if (!rut || !rut.match(/^[0-9]{7,8}-[0-9Kk]$/)) {
+      return false
+    }
+
+    const [body, dv] = rut.split('-')
+    const cleanDv = dv.toUpperCase()
+
+    let suma = 0
+    let multiplo = 2
+
+    for (let i = body.length - 1; i >= 0; i--) {
+      suma += multiplo * parseInt(body.charAt(i))
+      multiplo = multiplo < 7 ? multiplo + 1 : 2
+    }
+
+    const dvEsperado = 11 - (suma % 11)
+    const dvCalculado = dvEsperado === 11 ? '0' : dvEsperado === 10 ? 'K' : String(dvEsperado)
+
+    return cleanDv === dvCalculado
   }
 
-  const formatRut = (rut: string): string => {
-    const cleanRut = rut.replace(/\./g, '').replace(/-/g, '')
-    if (cleanRut.length <= 1) return cleanRut
+  const formatRut = (value: string): string => {
+    const cleaned = value.replace(/[^0-9Kk]/g, '').toUpperCase()
 
-    const body = cleanRut.slice(0, -1)
-    const dv = cleanRut.slice(-1)
+    if (cleaned.length === 0) return ''
+    if (cleaned.length === 1) return cleaned
 
-    const formattedBody = body.replace(/\B(?=(\d{3})+(?!\d))/g, '.')
-    return `${formattedBody}-${dv}`
+    const body = cleaned.slice(0, -1)
+    const dv = cleaned.slice(-1)
+
+    return `${body}-${dv}`
+  }
+
+  const cleanRut = (rut: string): string => {
+    return rut.replace(/[^0-9Kk]/g, '').toUpperCase()
   }
 
   const isRutAlreadySelected = (rut: string): boolean => {
-    const cleanRut = rut.replace(/\./g, '').replace(/-/g, '')
-    return selectedMechanics.some(m =>
-      m.rut.replace(/\./g, '').replace(/-/g, '') === cleanRut
-    )
+    const cleanedRut = cleanRut(rut)
+    return selectedMechanics.some(m => cleanRut(m.rut) === cleanedRut)
   }
 
-  const handleSelectExistingMechanic = (mechanic: Mechanic) => {
+  const handleSelectExistingMechanic = (mechanic: GetMechanicInfo) => {
     if (isRutAlreadySelected(mechanic.rut)) {
-      alert('Este mecánico ya está seleccionado')
       return
     }
 
     const newSelectedMechanic: MechanicSelection = {
       ...mechanic,
-      rut: formatRut(mechanic.rut),
       isLeader: selectedMechanics.length === 0,
       isExisting: true
     }
@@ -131,7 +148,7 @@ export default function SelectMechanics({ onMechanicsChange }: Props) {
     if (!newMechanic.rut.trim()) {
       newErrors.rut = 'El RUT es requerido'
     } else if (!validateRut(newMechanic.rut)) {
-      newErrors.rut = 'RUT inválido'
+      newErrors.rut = 'RUT inválido. Formato: 12345678-9'
     }
 
     if (isRutAlreadySelected(newMechanic.rut)) {
@@ -146,7 +163,7 @@ export default function SelectMechanics({ onMechanicsChange }: Props) {
     const mechanic: MechanicSelection = {
       id: Date.now(),
       name: newMechanic.name.trim(),
-      rut: formatRut(newMechanic.rut),
+      rut: newMechanic.rut,
       isLeader: selectedMechanics.length === 0,
       isExisting: false
     }
@@ -172,8 +189,12 @@ export default function SelectMechanics({ onMechanicsChange }: Props) {
   }
 
   const handleRutChange = (value: string) => {
-    const cleanValue = value.replace(/[^0-9Kk.-]/g, '')
-    setNewMechanic({ ...newMechanic, rut: cleanValue })
+    const cleaned = value.replace(/[^0-9Kk]/g, '').toUpperCase()
+
+    const limited = cleaned.slice(0, 9)
+    const formatted = formatRut(limited)
+
+    setNewMechanic({ ...newMechanic, rut: formatted })
   }
 
   const filteredAvailableMechanics = availableMechanics.filter(mechanic => {
@@ -245,7 +266,7 @@ export default function SelectMechanics({ onMechanicsChange }: Props) {
                       </div>
                       <div>
                         <p className="text-white font-medium">{mechanic.name}</p>
-                        <p className="text-slate-400 text-sm">{formatRut(mechanic.rut)}</p>
+                        <p className="text-slate-400 text-sm font-mono">{mechanic.rut}</p>
                       </div>
                     </div>
                     <svg className="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -302,7 +323,7 @@ export default function SelectMechanics({ onMechanicsChange }: Props) {
 
           <div>
             <label className="block text-slate-300 text-sm font-medium mb-2">
-              RUT
+              RUT (sin puntos, con guión)
             </label>
             <input
               type="text"
@@ -311,9 +332,10 @@ export default function SelectMechanics({ onMechanicsChange }: Props) {
                 handleRutChange(e.target.value)
                 setErrors({ ...errors, rut: '' })
               }}
-              placeholder="12.345.678-9"
+              placeholder="12345678-9"
+              maxLength={10}
               className={cn(
-                "w-full px-4 py-2.5 rounded-lg",
+                "w-full px-4 py-2.5 rounded-lg font-mono",
                 "bg-slate-800/50 border text-white placeholder-slate-400",
                 "focus:outline-none focus:ring-2 transition-all",
                 errors.rut
@@ -327,6 +349,11 @@ export default function SelectMechanics({ onMechanicsChange }: Props) {
                   <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                 </svg>
                 {errors.rut}
+              </p>
+            )}
+            {!errors.rut && newMechanic.rut && (
+              <p className="text-slate-400 text-xs mt-1">
+                Formato correcto: sin puntos, solo guión
               </p>
             )}
           </div>
@@ -408,7 +435,7 @@ export default function SelectMechanics({ onMechanicsChange }: Props) {
                       <span className="text-white font-medium">{mechanic.name}</span>
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-slate-300">
+                  <td className="px-6 py-4 whitespace-nowrap text-slate-300 font-mono">
                     {mechanic.rut}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-center">

@@ -4,7 +4,7 @@ export type ClientOptions = {
     baseUrl: 'http://localhost:8080' | (string & {});
 };
 
-export type GetWorkServiceResponse = {
+export type GetService = {
     /**
      * ID del servicio
      */
@@ -43,11 +43,11 @@ export type CreateWorkOrderHasDashboardLightRequest = {
     /**
      * Si el dashboard light está presente (default false)
      */
-    present?: boolean;
+    present: boolean;
     /**
      * Si el dashboard light opera correctamente (default false)
      */
-    isFunctional?: boolean;
+    isFunctional: boolean;
 };
 
 /**
@@ -101,13 +101,13 @@ export type CreateWorkOrderResponse = {
      */
     recordId?: number;
     /**
-     * Estimated date in yyyy-MM-dd format
+     * Created date in yyyy-MM-dd format
      */
-    estimatedDate?: string;
+    cratedAt?: string;
     /**
-     * Estimated time in HH:mm[:ss] format
+     * Estimated delivery date in yyyy-MM-dd format
      */
-    estimatedTime?: string;
+    estimatedDelivery?: string;
     /**
      * Path to the signature file
      */
@@ -144,7 +144,7 @@ export type CreateMechanicResponse = {
 export type CreateClientRequest = {
     firstName: string;
     rut: string;
-    lastName: string;
+    lastName?: string;
     emailAddress: string;
     address: string;
     cellphoneNumber: string;
@@ -240,22 +240,83 @@ export type CreateCarBrandResponse = {
     registration_number?: string;
 };
 
+export type TrimmedWorkOrder = {
+    id: number;
+    isCompleted: boolean;
+    estimatedTime: string;
+    signatureUrl: string;
+    mechanicLeaderFullName: string;
+    clientFirstName: string;
+    clientLastName: string;
+    clientCellphoneNumber: string;
+    carLicensePlate: string;
+};
+
+export type Client = {
+    id: number;
+    firstName: string;
+    rut: string;
+    lastName: string;
+    emailAddress: string;
+    address: string;
+    cellphoneNumber: string;
+};
+
+export type GetCar = {
+    id: number;
+    VIN: string;
+    licensePlate: string;
+    modelId: number;
+    modelName: string;
+    modelType: string;
+    modelYear: number;
+    brandId: number;
+    brandName: string;
+};
+
+export type GetImage = {
+    id: number;
+    url: string;
+    alt: string;
+};
+
+export type GetMechanicWorkOrder = {
+    id: number;
+    name: string;
+    rut: string;
+    isLeader: boolean;
+};
+
+export type GetWorkOrderFull = {
+    id?: number;
+    createdAt?: string;
+    estimatedDelivery?: string;
+    services?: Array<GetService>;
+    mechanics?: Array<GetMechanicWorkOrder>;
+    signatureUrl?: string;
+    carImages?: Array<GetImage>;
+    dashboardLights?: Array<GetWorkOrderHasDashboardLight>;
+    customer?: Client;
+    vehicle?: GetCar;
+};
+
+export type GetWorkOrderHasDashboardLight = {
+    imageId: number;
+    url: string;
+    alt: string;
+    isFunctional: boolean;
+};
+
 export type SingleMechanicalCondition = {
     id: number;
     partName: string;
     conditionState: string;
 };
 
-export type Mechanic = {
+export type GetMechanicInfo = {
     id: number;
     name: string;
     rut: string;
-};
-
-export type CreateImageRequest = {
-    id: number;
-    url: string;
-    alt: string;
 };
 
 export type ClientInfo = {
@@ -265,6 +326,7 @@ export type ClientInfo = {
     emailAddress?: string;
     address?: string;
     cellphoneNumber?: string;
+    rut: string;
 };
 
 export type GetCheckInBasicResponse = {
@@ -389,18 +451,6 @@ export type GetCarResponse = {
     modelName: string;
 };
 
-export type GetCarFullResponse = {
-    id: number;
-    VIN: string;
-    licensePlate: string;
-    modelId: number;
-    modelName: string;
-    modelType: string;
-    modelYear: number;
-    brandId: number;
-    brandName: string;
-};
-
 export type GetCarModelResponse = {
     id: number;
     modelName: string;
@@ -426,7 +476,7 @@ export type GetAllWorkServicesResponses = {
     /**
      * List returned successfully
      */
-    200: Array<GetWorkServiceResponse>;
+    200: Array<GetService>;
 };
 
 export type GetAllWorkServicesResponse = GetAllWorkServicesResponses[keyof GetAllWorkServicesResponses];
@@ -442,7 +492,7 @@ export type CreateErrors = {
     /**
      * Validation error
      */
-    400: GetWorkServiceResponse;
+    400: GetService;
 };
 
 export type CreateError = CreateErrors[keyof CreateErrors];
@@ -451,7 +501,7 @@ export type CreateResponses = {
     /**
      * Service created successfully
      */
-    200: GetWorkServiceResponse;
+    200: GetService;
 };
 
 export type CreateResponse = CreateResponses[keyof CreateResponses];
@@ -541,7 +591,7 @@ export type GetAllMechanicsResponses = {
     /**
      * OK
      */
-    200: Array<Mechanic>;
+    200: Array<GetMechanicInfo>;
 };
 
 export type GetAllMechanicsResponse = GetAllMechanicsResponses[keyof GetAllMechanicsResponses];
@@ -722,21 +772,42 @@ export type CreateMechanic1Responses = {
 
 export type CreateMechanic1Response = CreateMechanic1Responses[keyof CreateMechanic1Responses];
 
-export type GetAllData = {
+export type GetAllWorkOrdersData = {
     body?: never;
     path?: never;
     query?: never;
     url: '/api/work-orders';
 };
 
-export type GetAllResponses = {
+export type GetAllWorkOrdersResponses = {
     /**
      * OK
      */
-    200: Array<CreateWorkOrderResponse>;
+    200: Array<TrimmedWorkOrder>;
 };
 
-export type GetAllResponse = GetAllResponses[keyof GetAllResponses];
+export type GetAllWorkOrdersResponse = GetAllWorkOrdersResponses[keyof GetAllWorkOrdersResponses];
+
+export type GetWorkOrderFullByIdData = {
+    body?: never;
+    path: {
+        /**
+         * ID de la orden de trabajo
+         */
+        id: number;
+    };
+    query?: never;
+    url: '/api/work-orders/{id}/full';
+};
+
+export type GetWorkOrderFullByIdResponses = {
+    /**
+     * OK
+     */
+    200: GetWorkOrderFull;
+};
+
+export type GetWorkOrderFullByIdResponse = GetWorkOrderFullByIdResponses[keyof GetWorkOrderFullByIdResponses];
 
 export type GetInteriorConditionsData = {
     body?: never;
@@ -797,7 +868,7 @@ export type GetImageCategoryResponses = {
     /**
      * OK
      */
-    200: Array<CreateImageRequest>;
+    200: Array<GetImage>;
 };
 
 export type GetImageCategoryResponse = GetImageCategoryResponses[keyof GetImageCategoryResponses];
@@ -833,7 +904,7 @@ export type GetCarFullByIdResponses = {
     /**
      * OK
      */
-    200: GetCarFullResponse;
+    200: GetCar;
 };
 
 export type GetCarFullByIdResponse = GetCarFullByIdResponses[keyof GetCarFullByIdResponses];
@@ -867,7 +938,7 @@ export type GetCarFullByPatentResponses = {
     /**
      * OK
      */
-    200: GetCarFullResponse;
+    200: GetCar;
 };
 
 export type GetCarFullByPatentResponse = GetCarFullByPatentResponses[keyof GetCarFullByPatentResponses];

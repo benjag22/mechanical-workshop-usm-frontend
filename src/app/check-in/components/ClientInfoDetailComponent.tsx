@@ -95,7 +95,7 @@ export default function ClientInfoDetailComponent({
             <InputField
               label="Apellido"
               icon={<User className="w-3 h-3 lg:w-4 lg:h-4" />}
-              value={clientInfo.lastName}
+              value={clientInfo.lastName ?? ""}
               onChange={(e) => handleInputChange("lastName", e.target.value)}
               placeholder="Ingrese el apellido"
             />

@@ -2,7 +2,7 @@
 
 import { type Client, formDataBodySerializer, type Options as Options2, type TDataShape } from './client';
 import { client } from './client.gen';
-import type { CreateCarData, CreateCarModelData, CreateCarModelResponses, CreateCarResponses, CreateCheckInData, CreateCheckInResponses, CreateClientData, CreateClientResponses, CreateData, CreateErrors, CreateFullData, CreateFullResponses, CreateMechanic1Data, CreateMechanic1Responses, CreateMechanicalConditionData, CreateMechanicalConditionResponses, CreateMechanicData, CreateMechanicResponses, CreateResponses, CreateToolData, CreateToolResponses, GetAllCarBrandsData, GetAllCarBrandsResponses, GetAllCarModelsData, GetAllCarModelsResponses, GetAllCarsData, GetAllCarsResponses, GetAllCheckInFullData, GetAllCheckInFullResponses, GetAllClientsData, GetAllClientsResponses, GetAllData, GetAllMechanicsData, GetAllMechanicsResponses, GetAllPatentsData, GetAllPatentsResponses, GetAllResponses, GetAllToolsData, GetAllToolsResponses, GetAllWorkServicesData, GetAllWorkServicesResponses, GetCarFullByIdData, GetCarFullByIdResponses, GetCarFullByPatentData, GetCarFullByPatentResponses, GetCarModelData, GetCarModelResponses, GetCheckInFullData, GetCheckInFullResponses, GetElectricalConditionsData, GetElectricalConditionsResponses, GetExteriorConditionsData, GetExteriorConditionsResponses, GetImageCategoryData, GetImageCategoryResponses, GetInteriorConditionsData, GetInteriorConditionsResponses } from './types.gen';
+import type { CreateCarData, CreateCarModelData, CreateCarModelResponses, CreateCarResponses, CreateCheckInData, CreateCheckInResponses, CreateClientData, CreateClientResponses, CreateData, CreateErrors, CreateFullData, CreateFullResponses, CreateMechanic1Data, CreateMechanic1Responses, CreateMechanicalConditionData, CreateMechanicalConditionResponses, CreateMechanicData, CreateMechanicResponses, CreateResponses, CreateToolData, CreateToolResponses, GetAllCarBrandsData, GetAllCarBrandsResponses, GetAllCarModelsData, GetAllCarModelsResponses, GetAllCarsData, GetAllCarsResponses, GetAllCheckInFullData, GetAllCheckInFullResponses, GetAllClientsData, GetAllClientsResponses, GetAllMechanicsData, GetAllMechanicsResponses, GetAllPatentsData, GetAllPatentsResponses, GetAllToolsData, GetAllToolsResponses, GetAllWorkOrdersData, GetAllWorkOrdersResponses, GetAllWorkServicesData, GetAllWorkServicesResponses, GetCarFullByIdData, GetCarFullByIdResponses, GetCarFullByPatentData, GetCarFullByPatentResponses, GetCarModelData, GetCarModelResponses, GetCheckInFullData, GetCheckInFullResponses, GetElectricalConditionsData, GetElectricalConditionsResponses, GetExteriorConditionsData, GetExteriorConditionsResponses, GetImageCategoryData, GetImageCategoryResponses, GetInteriorConditionsData, GetInteriorConditionsResponses, GetWorkOrderFullByIdData, GetWorkOrderFullByIdResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
@@ -205,9 +205,21 @@ export const createMechanic1 = <ThrowOnError extends boolean = false>(options: O
  *
  * Returns a list of all work orders.
  */
-export const getAll = <ThrowOnError extends boolean = false>(options?: Options<GetAllData, ThrowOnError>) => {
-    return (options?.client ?? client).get<GetAllResponses, unknown, ThrowOnError>({
+export const getAllWorkOrders = <ThrowOnError extends boolean = false>(options?: Options<GetAllWorkOrdersData, ThrowOnError>) => {
+    return (options?.client ?? client).get<GetAllWorkOrdersResponses, unknown, ThrowOnError>({
         url: '/api/work-orders',
+        ...options
+    });
+};
+
+/**
+ * Get full work order by ID
+ *
+ * Obtiene todos los datos detallados de la orden de trabajo por su ID.
+ */
+export const getWorkOrderFullById = <ThrowOnError extends boolean = false>(options: Options<GetWorkOrderFullByIdData, ThrowOnError>) => {
+    return (options.client ?? client).get<GetWorkOrderFullByIdResponses, unknown, ThrowOnError>({
+        url: '/api/work-orders/{id}/full',
         ...options
     });
 };

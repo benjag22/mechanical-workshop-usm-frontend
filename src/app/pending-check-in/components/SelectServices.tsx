@@ -2,7 +2,7 @@
 
 import { cn } from "@/app/cn";
 import { useState, useEffect } from "react";
-import api, { CreateWorkServiceRequest, GetWorkServiceResponse } from "@/api"
+import api, { CreateWorkServiceRequest, GetService } from "@/api"
 
 type ServiceSelection = {
   id: number;
@@ -19,7 +19,7 @@ type Props = {
 }
 
 export default function SelectServices({ onServicesChange }: Props) {
-  const [availableServices, setAvailableServices] = useState<GetWorkServiceResponse[]>([]);
+  const [availableServices, setAvailableServices] = useState<GetService[]>([]);
   const [selectedServices, setSelectedServices] = useState<ServiceSelection[]>([]);
   const [isLoadingServices, setIsLoadingServices] = useState(true);
   const [showExistingList, setShowExistingList] = useState(false);
@@ -74,7 +74,7 @@ export default function SelectServices({ onServicesChange }: Props) {
     );
   };
 
-  const handleSelectExistingService = (service: GetWorkServiceResponse) => {
+  const handleSelectExistingService = (service: GetService) => {
     if (isServiceAlreadySelected(service.name)) {
       alert('Este servicio ya está seleccionado');
       return;
@@ -391,7 +391,6 @@ export default function SelectServices({ onServicesChange }: Props) {
                     <input
                       type="number"
                       value={serviceMinutes}
-                      defaultValue={0}
                       onChange={(e) => {
                         const value = parseInt(e.target.value);
                         if (e.target.value === '' || (value >= 0 && value <= 59)) {

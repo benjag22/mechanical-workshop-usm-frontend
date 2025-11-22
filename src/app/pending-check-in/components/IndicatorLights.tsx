@@ -1,22 +1,23 @@
 import Image from "next/image";
 import { cn } from "@/app/cn";
-import { CreateImageRequest } from "@/api";
+import { GetImage } from "@/api";
 
-type LightData = CreateImageRequest & {
+type LightData = GetImage & {
   present: boolean;
-  is_functional: boolean;
+  isFunctional: boolean;
 };
+
 
 type IndicatorLightsProps = {
   lightsData: LightData[];
-  onLightChange: (index: number, field: 'present' | 'is_functional', value: boolean) => void;
+  onLightChange: (index: number, field: 'present' | 'isFunctional', value: boolean) => void;
 }
 
 export default function IndicatorLights({ lightsData, onLightChange }: IndicatorLightsProps) {
   const handlePresentChange = (index: number, present: boolean) => {
     onLightChange(index, 'present', present);
     if (!present) {
-      onLightChange(index, 'is_functional', false);
+      onLightChange(index, 'isFunctional', false);
     }
   };
 
@@ -36,7 +37,7 @@ export default function IndicatorLights({ lightsData, onLightChange }: Indicator
     <div className="space-y-4 pr-4">
       {lightsData.map((light, index) => (
         <div
-          key={light.id}
+          key={light.url}
           className={cn(
             "bg-slate-700/50 rounded-xl p-6 border transition-all duration-200",
             light.present
@@ -63,9 +64,9 @@ export default function IndicatorLights({ lightsData, onLightChange }: Indicator
               {light.present && (
                 <span className={cn(
                   "text-xs font-medium mt-1 inline-block",
-                  light.is_functional ? "text-emerald-400" : "text-red-400"
+                  light.isFunctional ? "text-emerald-400" : "text-red-400"
                 )}>
-                                    {light.is_functional ? "✓ Funcionando" : "✗ Con fallas"}
+                                    {light.isFunctional ? "✓ Funcionando" : "✗ Con fallas"}
                                 </span>
               )}
             </div>
@@ -116,16 +117,16 @@ export default function IndicatorLights({ lightsData, onLightChange }: Indicator
               <p className="text-slate-300 text-sm mb-3 font-medium">¿Funciona correctamente?</p>
               <div className="flex gap-3">
                 <button
-                  onClick={() => onLightChange(index, 'is_functional', true)}
+                  onClick={() => onLightChange(index, 'isFunctional', true)}
                   className={cn(
                     "flex-1 px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200",
                     "flex items-center justify-center gap-2",
-                    light.is_functional
+                    light.isFunctional
                       ? "bg-emerald-600 text-white shadow-lg shadow-emerald-600/25 ring-2 ring-emerald-400"
                       : "bg-slate-600 text-slate-300 hover:bg-slate-500"
                   )}
                 >
-                  {light.is_functional && (
+                  {light.isFunctional && (
                     <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                     </svg>
@@ -133,16 +134,16 @@ export default function IndicatorLights({ lightsData, onLightChange }: Indicator
                   Sí
                 </button>
                 <button
-                  onClick={() => onLightChange(index, 'is_functional', false)}
+                  onClick={() => onLightChange(index, 'isFunctional', false)}
                   className={cn(
                     "flex-1 px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200",
                     "flex items-center justify-center gap-2",
-                    !light.is_functional
+                    !light.isFunctional
                       ? "bg-red-600 text-white shadow-lg shadow-red-600/25 ring-2 ring-red-400"
                       : "bg-slate-600 text-slate-300 hover:bg-slate-500"
                   )}
                 >
-                  {!light.is_functional && (
+                  {!light.isFunctional && (
                     <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
                     </svg>

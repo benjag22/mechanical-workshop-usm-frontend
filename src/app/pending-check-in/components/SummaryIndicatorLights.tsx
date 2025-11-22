@@ -2,18 +2,18 @@
 
 import { useState, useEffect } from "react";
 import IndicatorLights from "./IndicatorLights";
-import api, { CreateImageRequest, CreateWorkOrderHasDashboardLightRequest } from "@/api";
+import api, { GetImage, CreateWorkOrderHasDashboardLightRequest } from "@/api";
 
-type LightData = CreateImageRequest & {
+type LightData = GetImage & {
   present: boolean;
-  is_functional: boolean;
+  isFunctional: boolean;
 };
 
 type Props = {
   onLightsChange: (lights: CreateWorkOrderHasDashboardLightRequest[]) => void;
 }
 
-async function getLightsData(): Promise<CreateImageRequest[]> {
+async function getLightsData(): Promise<GetImage[]> {
   try {
     const response = await api.getImageCategory();
     return response.data ?? [];
@@ -34,7 +34,7 @@ export default function SummaryIndicatorLights({ onLightsChange }: Props) {
       setLightsData(lights.map(light => ({
         ...light,
         present: false,
-        is_functional: false
+        isFunctional: false
       })));
       setIsLoading(false);
     }
@@ -46,13 +46,13 @@ export default function SummaryIndicatorLights({ onLightsChange }: Props) {
       const workOrderLights: CreateWorkOrderHasDashboardLightRequest[] = lightsData.map(light => ({
         dashboardLightId: light.id,
         present: light.present,
-        isFunctional: light.is_functional
+        isFunctional: light.isFunctional
       }));
       onLightsChange(workOrderLights);
     }
   }, [lightsData, onLightsChange]);
 
-  const handleLightChange = (index: number, field: 'present' | 'is_functional', value: boolean) => {
+  const handleLightChange = (index: number, field: 'present' | 'isFunctional', value: boolean) => {
     setLightsData(prev => prev.map((light, i) =>
       i === index
         ? { ...light, [field]: value }
@@ -64,8 +64,8 @@ export default function SummaryIndicatorLights({ onLightsChange }: Props) {
     total: lightsData.length,
     evaluated: lightsData.filter(light => light.present).length,
     present: lightsData.filter(light => light.present).length,
-    functioning: lightsData.filter(light => light.present && light.is_functional).length,
-    notFunctioning: lightsData.filter(light => light.present && !light.is_functional).length,
+    functioning: lightsData.filter(light => light.present && light.isFunctional).length,
+    notFunctioning: lightsData.filter(light => light.present && !light.isFunctional).length,
     notPresent: lightsData.filter(light => !light.present).length,
   };
 
