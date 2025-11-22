@@ -3,26 +3,42 @@
 import {cn} from "@/app/cn";
 import {Wrench, Clock, CheckCircle2, Circle} from "lucide-react";
 import {useState} from "react";
+import {GetServiceState} from "@/api";
 
-type Service = {
-  name: string;
-  time: number;
-  completed?: boolean;
-}
-
-export default function ServicesChecklistCard({services: initialServices}: { services: Service[] }) {
+export default function ServicesChecklistCard({services: initialServices}: { services: GetServiceState[] }) {
   const [services, setServices] = useState(initialServices);
 
   const toggleService = (index: number) => {
     setServices(prev => prev.map((service, i) =>
-      i === index ? {...service, completed: !service.completed} : service
+      i === index ? {...service, finalized: !service.finalized} : service
     ));
   };
 
-  const totalTime = services.reduce((acc, service) => acc + service.time, 0);
+  const parseTimeToHours = (time: string): number => {
+    if (!time) return 0;
+
+    const [hours, minutes] = time.split(':').map(Number);
+
+    if (isNaN(hours) || isNaN(minutes)) return 0;
+
+    return hours + (minutes / 60);
+  };
+
+  const formatHoursToTime = (hours: number): string => {
+    const h = Math.floor(hours);
+    const m = Math.round((hours - h) * 60);
+    return `${h}h ${m}m`;
+  };
+
+  const totalTime = services.reduce((acc, service) =>
+    acc + parseTimeToHours(service.estimatedTime), 0
+  );
+
   const completedTime = services
-    .filter(s => s.completed)
-    .reduce((acc, service) => acc + service.time, 0);
+    .filter(s => s.finalized)
+    .reduce((acc, service) =>
+      acc + parseTimeToHours(service.estimatedTime), 0
+    );
 
   return (
     <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
@@ -38,7 +54,7 @@ export default function ServicesChecklistCard({services: initialServices}: { ser
         <div className="flex items-center gap-2 text-sm">
           <Clock className="w-4 h-4 text-slate-400" />
           <span className="text-slate-600">
-            {completedTime}h / {totalTime}h
+            {formatHoursToTime(completedTime)} / {formatHoursToTime(totalTime)}
           </span>
         </div>
       </div>
@@ -51,12 +67,12 @@ export default function ServicesChecklistCard({services: initialServices}: { ser
             className={cn(
               "w-full flex items-center gap-3 p-4 rounded-lg border-2 transition-all",
               "hover:bg-slate-50",
-              service.completed
+              service.finalized
                 ? "border-green-200 bg-green-50/50"
                 : "border-slate-200 bg-white"
             )}
           >
-            {service.completed ? (
+            {service.finalized ? (
               <CheckCircle2 className="w-6 h-6 text-green-600 flex-shrink-0" />
             ) : (
               <Circle className="w-6 h-6 text-slate-300 flex-shrink-0" />
@@ -64,7 +80,7 @@ export default function ServicesChecklistCard({services: initialServices}: { ser
             <div className="flex-1 text-left">
               <p className={cn(
                 "font-medium",
-                service.completed
+                service.finalized
                   ? "text-green-900 line-through"
                   : "text-slate-900"
               )}>
@@ -73,11 +89,11 @@ export default function ServicesChecklistCard({services: initialServices}: { ser
             </div>
             <span className={cn(
               "text-sm font-medium px-2 py-1 rounded",
-              service.completed
+              service.finalized
                 ? "bg-green-100 text-green-700"
                 : "bg-slate-100 text-slate-600"
             )}>
-              {service.time}h
+              {service.estimatedTime}
             </span>
           </button>
         ))}
@@ -87,13 +103,13 @@ export default function ServicesChecklistCard({services: initialServices}: { ser
         <div className="flex items-center justify-between mb-2">
           <span className="text-sm text-slate-600">Progreso</span>
           <span className="text-sm font-semibold text-slate-900">
-            {Math.round((completedTime / totalTime) * 100)}%
+            {totalTime > 0 ? Math.round((completedTime / totalTime) * 100) : 0}%
           </span>
         </div>
         <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
           <div
             className="h-full bg-gradient-to-r from-green-500 to-green-600 transition-all duration-500"
-            style={{width: `${(completedTime / totalTime) * 100}%`}}
+            style={{width: `${totalTime > 0 ? (completedTime / totalTime) * 100 : 0}%`}}
           />
         </div>
       </div>

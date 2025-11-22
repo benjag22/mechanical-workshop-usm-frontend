@@ -1,14 +1,7 @@
 import {Mail, Phone, MapPin, User} from "lucide-react";
+import {Client} from "@/api"
 
-type ClientInfo = {
-  firstName: string;
-  lastName: string;
-  email: string;
-  phoneNumber: string;
-  address: string;
-}
-
-export default function ClientInfoCard({client}: { client: ClientInfo }) {
+export default function ClientInfoCard({client}: { client: Client }) {
   return (
     <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
       <div className="flex items-center gap-3 mb-4">
@@ -32,7 +25,7 @@ export default function ClientInfoCard({client}: { client: ClientInfo }) {
           <Mail className="w-4 h-4 text-slate-400 mt-1" />
           <div>
             <p className="text-sm text-slate-500">Email</p>
-            <p className="text-slate-900">{client.email}</p>
+            <p className="text-slate-900">{client.emailAddress}</p>
           </div>
         </div>
 
@@ -40,7 +33,7 @@ export default function ClientInfoCard({client}: { client: ClientInfo }) {
           <Phone className="w-4 h-4 text-slate-400 mt-1" />
           <div>
             <p className="text-sm text-slate-500">Teléfono</p>
-            <p className="text-slate-900">{client.phoneNumber}</p>
+            <p className="text-slate-900">{client.cellphoneNumber}</p>
           </div>
         </div>
 
