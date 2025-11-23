@@ -11,11 +11,9 @@ type SelectedTool = {
 
 type Props = {
   onToolsChange: (toolIds: number[], newTools: string[]) => void;
-  selectedToolIds: number[];
-  selectedNewTools: string[];
 }
 
-export default function SelectToolsComponent({ onToolsChange, selectedToolIds, selectedNewTools }: Props) {
+export default function SelectToolsComponent({ onToolsChange }: Props) {
   const [selectedTools, setSelectedTools] = useState<SelectedTool[]>([]);
   const [customTool, setCustomTool] = useState<string>("");
   const [showCustomInput, setShowCustomInput] = useState<boolean>(false);

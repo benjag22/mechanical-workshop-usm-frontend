@@ -193,8 +193,6 @@ export default function CheckInPage() {
         <SelectToolsComponent
           key={`tools-${formKey}`}
           onToolsChange={handleTools}
-          selectedToolIds={checkInRequest.toolsIds}
-          selectedNewTools={checkInRequest.newTools.map(t => t.name)}
         />
       )
     }

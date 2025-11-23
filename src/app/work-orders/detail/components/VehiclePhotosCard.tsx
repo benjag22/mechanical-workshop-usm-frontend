@@ -4,6 +4,7 @@ import {cn} from "@/app/cn";
 import {Camera, ZoomIn} from "lucide-react";
 import {useState} from "react";
 import {GetImage} from "@/api";
+import Image from "next/image";
 
 export default function VehiclePhotosCard({photos}: { photos: GetImage[] }) {
   const [selectedPhoto, setSelectedPhoto] = useState<GetImage | null>(null);
@@ -81,7 +82,7 @@ export default function VehiclePhotosCard({photos}: { photos: GetImage[] }) {
         >
           <div className="relative max-w-4xl w-full aspect-video bg-gradient-to-br from-slate-700 to-slate-900 rounded-xl overflow-hidden">
             {selectedPhoto.url ? (
-              <img
+              <Image
                 src={selectedPhoto.url}
                 alt={selectedPhoto.alt}
                 className="w-full h-full object-cover"

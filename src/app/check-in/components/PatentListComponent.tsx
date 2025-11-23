@@ -5,27 +5,7 @@ import {useState, useEffect} from "react";
 import {Search, Car, Plus, Loader2} from "lucide-react";
 import NewCarDetailComponent from "./NewCarDetailComponent";
 import ExistsCarDetailComponent from "./ExistsCarDetailComponent";
-import api from "@/api";
-
-type GetCarResponse = {
-  id: number;
-  VIN: string;
-  licensePlate: string;
-  modelId: number;
-  modelName: string;
-}
-
-type GetCarFullResponse = {
-  id: number;
-  VIN: string;
-  licensePlate: string;
-  modelId: number;
-  modelName: string;
-  modelType: string;
-  modelYear: number;
-  brandId: number;
-  brandName: string;
-}
+import api , {GetCarResponse, GetCar}from "@/api";
 
 type PatentListComponentProps = {
   onCarDataChange: (carData: {
@@ -53,7 +33,7 @@ type PatentListComponentProps = {
 export default function PatentListComponent({ onCarDataChange }: PatentListComponentProps){
   const [searchTerm, setSearchTerm] = useState("");
   const [showNewCarForm, setShowNewCarForm] = useState(false);
-  const [selectedCarFull, setSelectedCarFull] = useState<GetCarFullResponse | null>(null);
+  const [selectedCarFull, setSelectedCarFull] = useState<GetCar | null>(null);
   const [cars, setCars] = useState<GetCarResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingCarDetail, setLoadingCarDetail] = useState(false);
@@ -204,9 +184,7 @@ export default function PatentListComponent({ onCarDataChange }: PatentListCompo
                 <Car className="w-4 h-4 lg:w-5 lg:h-5 mr-3 text-gray-400 flex-shrink-0" />
                 <div className="flex flex-col items-start text-left">
                   <span className="font-medium text-sm lg:text-base">{car.licensePlate}</span>
-                  <span className="text-xs lg:text-sm text-gray-400">
-                                        {car.modelName}
-                                    </span>
+                  <span className="text-xs lg:text-sm text-gray-400">{car.modelName}</span>
                 </div>
               </button>
             ))}

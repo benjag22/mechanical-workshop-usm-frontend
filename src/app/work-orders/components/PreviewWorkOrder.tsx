@@ -2,12 +2,12 @@
 
 import { useState } from "react";
 import { cn } from "@/app/cn";
-import { TrimmedWorkOrder } from "@/api";
+import { GetWorkOrder } from "@/api";
 import AuthorizationPopup from "./AuthorizationPopup";
 import { useRouter } from "next/navigation";
 import api from "@/api";
 
-export default function PreviewWorkOrder({ ...props }: TrimmedWorkOrder) {
+export default function PreviewWorkOrder({ ...props }: GetWorkOrder) {
   const router = useRouter();
   const [isAuthPopupOpen, setIsAuthPopupOpen] = useState(false);
 

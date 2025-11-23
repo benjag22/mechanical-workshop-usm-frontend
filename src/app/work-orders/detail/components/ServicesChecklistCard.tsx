@@ -1,17 +1,93 @@
 "use client";
 
 import {cn} from "@/app/cn";
-import {Wrench, Clock, CheckCircle2, Circle} from "lucide-react";
-import {useState} from "react";
-import {GetServiceState} from "@/api";
+import {CheckCircle2, Circle, Clock, Wrench, Save, Lock} from "lucide-react";
+import {useState, useMemo} from "react";
+import api, {CreateWorkOrderRealizedServiceResponse, GetServiceState} from "@/api";
 
-export default function ServicesChecklistCard({services: initialServices}: { services: GetServiceState[] }) {
+async function saveProgress(workOrderId:number, serviceIds : Array<number>) {
+  try {
+    const response = await api.toggleRealizedServicesFinalized({
+      path: {workOrderId},
+      body: serviceIds
+    })
+    if(response.data){
+      return response.data
+    }else{
+      return [];
+    }
+
+  }catch (error) {
+    console.log(error);
+    throw error;
+  }
+}
+
+type ServicesChecklistCardProps = {
+  workOrderId: number;
+  services: GetServiceState[];
+  isCompleted: boolean;
+}
+
+export default function ServicesChecklistCard({
+                                                workOrderId,
+                                                services: initialServices,
+                                                isCompleted
+                                              }: ServicesChecklistCardProps) {
   const [services, setServices] = useState(initialServices);
+  const [savedServices, setSavedServices] = useState(initialServices);
+  const [isSaving, setIsSaving] = useState(false);
+
+  const hasChanges = useMemo(() => {
+    return services.some((service, index) =>
+      service.finalized !== savedServices[index]?.finalized
+    );
+  }, [services, savedServices]);
+
+  const getChangedServiceIds = () => {
+    return services
+      .filter((service, index) =>
+        service.finalized !== savedServices[index]?.finalized
+      )
+      .map(service => service.id);
+  };
 
   const toggleService = (index: number) => {
-    setServices(prev => prev.map((service, i) =>
-      i === index ? {...service, finalized: !service.finalized} : service
+    if (isCompleted) return;
+
+    setServices(prev => prev.map((s, i) =>
+      i === index ? {...s, finalized: !s.finalized} : s
     ));
+  };
+
+  const handleSaveProgress = async () => {
+    if (!hasChanges || isSaving || isCompleted) return;
+
+    setIsSaving(true);
+
+    try {
+      const changedIds = getChangedServiceIds();
+      const response = await saveProgress(workOrderId, changedIds);
+
+      if (response && response.length > 0) {
+        const updatedServices = services.map(service => {
+          const updatedService = response.find(
+            (r: CreateWorkOrderRealizedServiceResponse) => r.workServiceId === service.id
+          );
+          return updatedService
+            ? {...service, finalized: updatedService.finalized}
+            : service;
+        });
+
+        setServices(updatedServices);
+        setSavedServices(updatedServices);
+      }
+    } catch (error) {
+      console.error(error);
+      setServices(savedServices);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const parseTimeToHours = (time: string): number => {
@@ -50,6 +126,12 @@ export default function ServicesChecklistCard({services: initialServices}: { ser
           <h3 className="text-lg font-semibold text-slate-900">
             Servicios a Realizar
           </h3>
+          {isCompleted && (
+            <span className="inline-flex items-center gap-1 px-2 py-1 bg-slate-100 text-slate-600 text-xs font-medium rounded-full">
+              <Lock className="w-3 h-3" />
+              Bloqueado
+            </span>
+          )}
         </div>
         <div className="flex items-center gap-2 text-sm">
           <Clock className="w-4 h-4 text-slate-400" />
@@ -62,11 +144,13 @@ export default function ServicesChecklistCard({services: initialServices}: { ser
       <div className="space-y-2">
         {services.map((service, index) => (
           <button
-            key={index}
+            key={service.id}
             onClick={() => toggleService(index)}
+            disabled={isSaving || isCompleted}
             className={cn(
               "w-full flex items-center gap-3 p-4 rounded-lg border-2 transition-all",
-              "hover:bg-slate-50",
+              !isCompleted ? "hover:bg-slate-50" : "",
+              (isSaving || isCompleted) ? "opacity-50 cursor-not-allowed" : "",
               service.finalized
                 ? "border-green-200 bg-green-50/50"
                 : "border-slate-200 bg-white"
@@ -113,6 +197,33 @@ export default function ServicesChecklistCard({services: initialServices}: { ser
           />
         </div>
       </div>
+
+      {!isCompleted && (
+        <div className="mt-4">
+          <button
+            onClick={handleSaveProgress}
+            disabled={!hasChanges || isSaving}
+            className={cn(
+              "w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium transition-all",
+              hasChanges && !isSaving
+                ? "bg-purple-600 hover:bg-purple-700 text-white shadow-sm hover:shadow-md"
+                : "bg-slate-200 text-slate-400 cursor-not-allowed"
+            )}
+          >
+            <Save className="w-5 h-5" />
+            {isSaving ? "Guardando..." : hasChanges ? "Guardar Progreso" : "Sin Cambios"}
+          </button>
+        </div>
+      )}
+
+      {isCompleted && (
+        <div className="mt-4 p-3 bg-slate-50 border border-slate-200 rounded-lg">
+          <p className="text-sm text-slate-600 text-center flex items-center justify-center gap-2">
+            <Lock className="w-4 h-4" />
+            Esta orden de trabajo está completada. No se pueden modificar los servicios.
+          </p>
+        </div>
+      )}
     </div>
   );
 }

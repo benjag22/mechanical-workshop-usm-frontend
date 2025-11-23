@@ -2,7 +2,7 @@
 
 import { type Client, formDataBodySerializer, type Options as Options2, type TDataShape } from './client';
 import { client } from './client.gen';
-import type { CreateCarData, CreateCarModelData, CreateCarModelResponses, CreateCarResponses, CreateCheckInData, CreateCheckInResponses, CreateClientData, CreateClientResponses, CreateData, CreateErrors, CreateFullData, CreateFullResponses, CreateMechanic1Data, CreateMechanic1Responses, CreateMechanicalConditionData, CreateMechanicalConditionResponses, CreateMechanicData, CreateMechanicResponses, CreateResponses, CreateToolData, CreateToolResponses, GetAllCarBrandsData, GetAllCarBrandsResponses, GetAllCarModelsData, GetAllCarModelsResponses, GetAllCarsData, GetAllCarsResponses, GetAllCheckInBasicData, GetAllCheckInBasicResponses, GetAllClientsData, GetAllClientsResponses, GetAllMechanicsData, GetAllMechanicsResponses, GetAllPatentsData, GetAllPatentsResponses, GetAllToolsData, GetAllToolsResponses, GetAllWorkOrdersData, GetAllWorkOrdersResponses, GetAllWorkServicesData, GetAllWorkServicesResponses, GetCarFullByIdData, GetCarFullByIdResponses, GetCarFullByPatentData, GetCarFullByPatentResponses, GetCarModelData, GetCarModelResponses, GetCheckInFullData, GetCheckInFullResponses, GetElectricalConditionsData, GetElectricalConditionsResponses, GetExteriorConditionsData, GetExteriorConditionsResponses, GetImageCategoryData, GetImageCategoryResponses, GetInteriorConditionsData, GetInteriorConditionsResponses, GetPendingCheckInBasicData, GetPendingCheckInBasicResponses, GetWorkOrderFullByIdData, GetWorkOrderFullByIdResponses, IsAuthorizedData, IsAuthorizedResponses, ToggleRealizedServicesFinalizedData, ToggleRealizedServicesFinalizedResponses } from './types.gen';
+import type { CreateCarData, CreateCarModelData, CreateCarModelResponses, CreateCarResponses, CreateCheckInData, CreateCheckInResponses, CreateCheckOutData, CreateCheckOutResponses, CreateClientData, CreateClientResponses, CreateData, CreateErrors, CreateFullData, CreateFullResponses, CreateMechanic1Data, CreateMechanic1Responses, CreateMechanicalConditionData, CreateMechanicalConditionResponses, CreateMechanicData, CreateMechanicResponses, CreateResponses, CreateToolData, CreateToolResponses, GetAllCarBrandsData, GetAllCarBrandsResponses, GetAllCarModelsData, GetAllCarModelsResponses, GetAllCarsData, GetAllCarsResponses, GetAllCheckInBasicData, GetAllCheckInBasicResponses, GetAllClientsData, GetAllClientsResponses, GetAllMechanicsData, GetAllMechanicsResponses, GetAllPatentsData, GetAllPatentsResponses, GetAllToolsData, GetAllToolsResponses, GetAllWorkOrdersData, GetAllWorkOrdersResponses, GetAllWorkServicesData, GetAllWorkServicesResponses, GetByIdData, GetByIdResponses, GetCarFullByIdData, GetCarFullByIdResponses, GetCarFullByPatentData, GetCarFullByPatentResponses, GetCarModelData, GetCarModelResponses, GetCheckInFullData, GetCheckInFullResponses, GetElectricalConditionsData, GetElectricalConditionsResponses, GetExteriorConditionsData, GetExteriorConditionsResponses, GetImageCategoryData, GetImageCategoryResponses, GetInteriorConditionsData, GetInteriorConditionsResponses, GetPendingCheckInBasicData, GetPendingCheckInBasicResponses, GetWorkOrderFullByIdData, GetWorkOrderFullByIdResponses, IsAuthorizedData, IsAuthorizedResponses, MarkWorkOrderAsCompletedData, MarkWorkOrderAsCompletedResponses, ToggleRealizedServicesFinalizedData, ToggleRealizedServicesFinalizedResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
@@ -146,6 +146,17 @@ export const createCheckIn = <ThrowOnError extends boolean = false>(options: Opt
     });
 };
 
+export const createCheckOut = <ThrowOnError extends boolean = false>(options: Options<CreateCheckOutData, ThrowOnError>) => {
+    return (options.client ?? client).post<CreateCheckOutResponses, unknown, ThrowOnError>({
+        url: '/api/check-out',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
+
 export const getAllCars = <ThrowOnError extends boolean = false>(options?: Options<GetAllCarsData, ThrowOnError>) => {
     return (options?.client ?? client).get<GetAllCarsResponses, unknown, ThrowOnError>({
         url: '/api/car',
@@ -208,6 +219,13 @@ export const toggleRealizedServicesFinalized = <ThrowOnError extends boolean = f
             'Content-Type': 'application/json',
             ...options.headers
         }
+    });
+};
+
+export const markWorkOrderAsCompleted = <ThrowOnError extends boolean = false>(options: Options<MarkWorkOrderAsCompletedData, ThrowOnError>) => {
+    return (options.client ?? client).patch<MarkWorkOrderAsCompletedResponses, unknown, ThrowOnError>({
+        url: '/api/work-orders/{workOrderId}/complete',
+        ...options
     });
 };
 
@@ -280,6 +298,13 @@ export const getCheckInFull = <ThrowOnError extends boolean = false>(options: Op
 export const getPendingCheckInBasic = <ThrowOnError extends boolean = false>(options?: Options<GetPendingCheckInBasicData, ThrowOnError>) => {
     return (options?.client ?? client).get<GetPendingCheckInBasicResponses, unknown, ThrowOnError>({
         url: '/api/checkin/pending',
+        ...options
+    });
+};
+
+export const getById = <ThrowOnError extends boolean = false>(options: Options<GetByIdData, ThrowOnError>) => {
+    return (options.client ?? client).get<GetByIdResponses, unknown, ThrowOnError>({
+        url: '/api/check-out/{id}',
         ...options
     });
 };

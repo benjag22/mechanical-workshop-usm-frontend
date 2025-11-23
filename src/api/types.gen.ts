@@ -16,7 +16,7 @@ export type GetService = {
     /**
      * Tiempo estimado en formato HH:mm[:ss]
      */
-    estimatedTime: string;
+    estimatedHoursMinutes: string;
 };
 
 export type CreateWorkServiceRequest = {
@@ -210,6 +210,19 @@ export type CreateCheckInResponse = {
     tools_ids?: Array<number>;
 };
 
+export type CreateCheckOutRequest = {
+    workOrderId: number;
+    mileage: number;
+    vehicleDiagnosis: string;
+};
+
+export type CheckOutResponse = {
+    id: number;
+    entryTime: string;
+    mileage: number;
+    vehicleDiagnosis: string;
+};
+
 export type CreateCarRequest = {
     VIN: string;
     licensePlate: string;
@@ -244,28 +257,36 @@ export type CreateWorkOrderRealizedServiceResponse = {
     /**
      * ID del registro
      */
-    id?: number;
+    id: number;
     /**
      * ID del work order asociado
      */
-    workOrderId?: number;
+    workOrderId: number;
     /**
      * ID del work service asociado
      */
-    workServiceId?: number;
+    workServiceId: number;
     /**
      * Si el servicio está finalizado
      */
-    finalized?: boolean;
+    finalized: boolean;
 };
 
-export type TrimmedWorkOrder = {
+export type BasicWorkOrderInfo = {
+    workOrderId: number;
+    recordId: number;
+    createdAt: string;
+    completedAt: string;
+};
+
+export type GetWorkOrder = {
     id: number;
     isCompleted: boolean;
+    hasCheckOut: boolean;
     createdAt: string;
     deliveryTime: string;
     signatureUrl: string;
-    mechanicLeaderFullName: string;
+    mechanicLeaderFullName?: string;
     clientFirstName: string;
     clientLastName: string;
     clientCellphoneNumber: string;
@@ -328,6 +349,7 @@ export type GetServiceState = {
 
 export type GetWorkOrderFull = {
     id: number;
+    completed: boolean;
     createdAt: string;
     estimatedDelivery: string;
     services: Array<GetServiceState>;
@@ -337,6 +359,7 @@ export type GetWorkOrderFull = {
     dashboardLights?: Array<GetWorkOrderHasDashboardLight>;
     customer: Client;
     vehicle: GetCar;
+    checkOut?: CheckOutResponse;
 };
 
 export type GetWorkOrderHasDashboardLight = {
@@ -705,6 +728,22 @@ export type CreateCheckInResponses = {
 
 export type CreateCheckInResponse2 = CreateCheckInResponses[keyof CreateCheckInResponses];
 
+export type CreateCheckOutData = {
+    body: CreateCheckOutRequest;
+    path?: never;
+    query?: never;
+    url: '/api/check-out';
+};
+
+export type CreateCheckOutResponses = {
+    /**
+     * OK
+     */
+    200: CheckOutResponse;
+};
+
+export type CreateCheckOutResponse = CreateCheckOutResponses[keyof CreateCheckOutResponses];
+
 export type GetAllCarsData = {
     body?: never;
     path?: never;
@@ -819,6 +858,24 @@ export type ToggleRealizedServicesFinalizedResponses = {
 
 export type ToggleRealizedServicesFinalizedResponse = ToggleRealizedServicesFinalizedResponses[keyof ToggleRealizedServicesFinalizedResponses];
 
+export type MarkWorkOrderAsCompletedData = {
+    body?: never;
+    path: {
+        workOrderId: number;
+    };
+    query?: never;
+    url: '/api/work-orders/{workOrderId}/complete';
+};
+
+export type MarkWorkOrderAsCompletedResponses = {
+    /**
+     * OK
+     */
+    200: BasicWorkOrderInfo;
+};
+
+export type MarkWorkOrderAsCompletedResponse = MarkWorkOrderAsCompletedResponses[keyof MarkWorkOrderAsCompletedResponses];
+
 export type GetAllWorkOrdersData = {
     body?: never;
     path?: never;
@@ -830,7 +887,7 @@ export type GetAllWorkOrdersResponses = {
     /**
      * OK
      */
-    200: Array<TrimmedWorkOrder>;
+    200: Array<GetWorkOrder>;
 };
 
 export type GetAllWorkOrdersResponse = GetAllWorkOrdersResponses[keyof GetAllWorkOrdersResponses];
@@ -972,6 +1029,24 @@ export type GetPendingCheckInBasicResponses = {
 };
 
 export type GetPendingCheckInBasicResponse = GetPendingCheckInBasicResponses[keyof GetPendingCheckInBasicResponses];
+
+export type GetByIdData = {
+    body?: never;
+    path: {
+        id: number;
+    };
+    query?: never;
+    url: '/api/check-out/{id}';
+};
+
+export type GetByIdResponses = {
+    /**
+     * OK
+     */
+    200: CheckOutResponse;
+};
+
+export type GetByIdResponse = GetByIdResponses[keyof GetByIdResponses];
 
 export type GetCarFullByIdData = {
     body?: never;
