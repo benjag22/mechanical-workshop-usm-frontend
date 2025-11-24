@@ -6,7 +6,7 @@ import ClientInfoDetailComponent from "@/app/check-in/components/ClientInfoDetai
 import PatentListComponent from "@/app/check-in/components/PatentListComponent";
 import ListOfConditionsByType from "@/app/check-in/components/ListOfConditionsByType";
 import SelectToolsComponent from "@/app/check-in/components/SelectToolsComponent";
-import api, {Client, CreateCheckInRequest, CreateClientRequest} from "@/api";
+import api, {CreateCheckInRequest, CreateClientRequest} from "@/api";
 import {produce} from "immer";
 import ErrorDisplay from "@/app/components/ErrorDisplay";
 import LoadingSpinner from "@/app/components/LoadingSpinner";

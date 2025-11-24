@@ -2,10 +2,10 @@
 
 import {cn} from "@/app/cn";
 import {useState, useEffect} from "react";
-import {Search, Car, Plus, Loader2} from "lucide-react";
+import {Search, Car, Plus, Loader2, AlertCircle, Wrench, ClipboardCheck} from "lucide-react";
 import NewCarDetailComponent from "./NewCarDetailComponent";
 import ExistsCarDetailComponent from "./ExistsCarDetailComponent";
-import api , {GetCarResponse, GetCar}from "@/api";
+import api, {GetCarResponse, GetCar, GetCarState} from "@/api";
 
 type PatentListComponentProps = {
   onCarDataChange: (carData: {
@@ -34,7 +34,7 @@ export default function PatentListComponent({ onCarDataChange }: PatentListCompo
   const [searchTerm, setSearchTerm] = useState("");
   const [showNewCarForm, setShowNewCarForm] = useState(false);
   const [selectedCarFull, setSelectedCarFull] = useState<GetCar | null>(null);
-  const [cars, setCars] = useState<GetCarResponse[]>([]);
+  const [cars, setCars] = useState<GetCarState[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingCarDetail, setLoadingCarDetail] = useState(false);
 
@@ -42,7 +42,7 @@ export default function PatentListComponent({ onCarDataChange }: PatentListCompo
     async function loadCars() {
       try {
         setLoading(true);
-        const response = await api.getAllCars();
+        const response = await api.getAvailableCarsNoPendingRecords();
         setCars(response.data || []);
       } catch (error) {
         console.error("Error loading cars:", error);
@@ -59,7 +59,11 @@ export default function PatentListComponent({ onCarDataChange }: PatentListCompo
     car.licensePlate.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleCarSelect = async (car: GetCarResponse) => {
+  const handleCarSelect = async (car: GetCarState) => {
+    if (!car.is_available) {
+      return;
+    }
+
     try {
       setLoadingCarDetail(true);
       const response = await api.getCarFullById({path: {id: car.id}});
@@ -85,6 +89,42 @@ export default function PatentListComponent({ onCarDataChange }: PatentListCompo
   const handleBack = () => {
     setShowNewCarForm(false);
     setSelectedCarFull(null);
+  };
+
+  const getAvailabilityStatus = (car: GetCarState) => {
+    if (car.is_available) {
+      return {
+        available: true,
+        label: "Disponible",
+        icon: null,
+        colorClass: "text-green-400 bg-green-500/20 border-green-500/30"
+      };
+    }
+
+    if (car.atCheckIn) {
+      return {
+        available: false,
+        label: "En Check-in",
+        icon: ClipboardCheck,
+        colorClass: "text-orange-400 bg-orange-500/20 border-orange-500/30"
+      };
+    }
+
+    if (car.atWorkOrder) {
+      return {
+        available: false,
+        label: "En Orden de Trabajo",
+        icon: Wrench,
+        colorClass: "text-red-400 bg-red-500/20 border-red-500/30"
+      };
+    }
+
+    return {
+      available: false,
+      label: "No Disponible",
+      icon: AlertCircle,
+      colorClass: "text-gray-400 bg-gray-500/20 border-gray-500/30"
+    };
   };
 
   if (loadingCarDetail) {
@@ -169,25 +209,49 @@ export default function PatentListComponent({ onCarDataChange }: PatentListCompo
               <span className="font-medium text-sm lg:text-base">Nuevo Vehículo</span>
             </button>
 
-            {filteredCars.map((car) => (
-              <button
-                key={car.id}
-                onClick={() => handleCarSelect(car)}
-                className={cn(
-                  "flex w-full items-center p-3 lg:p-4 bg-gray-800/50 hover:bg-gray-700/50",
-                  "border border-gray-700/50 hover:border-gray-600/50 rounded-lg",
-                  "text-white transition-all duration-200 backdrop-blur-sm hover:scale-[1.001]",
-                  "focus:outline-none focus:ring-2 focus:ring-blue-500/50",
-                  "min-h-[60px] lg:min-h-[72px]"
-                )}
-              >
-                <Car className="w-4 h-4 lg:w-5 lg:h-5 mr-3 text-gray-400 flex-shrink-0" />
-                <div className="flex flex-col items-start text-left">
-                  <span className="font-medium text-sm lg:text-base">{car.licensePlate}</span>
-                  <span className="text-xs lg:text-sm text-gray-400">{car.modelName}</span>
-                </div>
-              </button>
-            ))}
+            {filteredCars.map((car) => {
+              const status = getAvailabilityStatus(car);
+              const StatusIcon = status.icon;
+
+              return (
+                <button
+                  key={car.id}
+                  onClick={() => handleCarSelect(car)}
+                  disabled={!status.available}
+                  className={cn(
+                    "flex w-full items-center p-3 lg:p-4 rounded-lg transition-all duration-200",
+                    "border backdrop-blur-sm min-h-[60px] lg:min-h-[72px]",
+                    "focus:outline-none",
+                    status.available
+                      ? "bg-gray-800/50 hover:bg-gray-700/50 border-gray-700/50 hover:border-gray-600/50 hover:scale-[1.001] cursor-pointer focus:ring-2 focus:ring-blue-500/50"
+                      : "bg-gray-800/30 border-gray-700/30 opacity-60 cursor-not-allowed"
+                  )}
+                >
+                  <Car className={cn(
+                    "w-4 h-4 lg:w-5 lg:h-5 mr-3 flex-shrink-0",
+                    status.available ? "text-gray-400" : "text-gray-500"
+                  )} />
+                  <div className="flex flex-col items-start text-left flex-1 min-w-0">
+                    <span className={cn(
+                      "font-medium text-sm lg:text-base",
+                      status.available ? "text-white" : "text-gray-400"
+                    )}>
+                      {car.licensePlate}
+                    </span>
+                    <span className="text-xs lg:text-sm text-gray-400 truncate w-full">
+                      {car.modelName}
+                    </span>
+                  </div>
+                  <div className={cn(
+                    "ml-2 flex items-center gap-1.5 px-2 py-1 rounded-md border text-xs font-medium whitespace-nowrap flex-shrink-0",
+                    status.colorClass
+                  )}>
+                    {StatusIcon && <StatusIcon className="w-3 h-3" />}
+                    <span className="hidden sm:inline">{status.label}</span>
+                  </div>
+                </button>
+              );
+            })}
           </div>
 
           {filteredCars.length === 0 && searchTerm && (
@@ -217,6 +281,8 @@ export default function PatentListComponent({ onCarDataChange }: PatentListCompo
             <div className="mt-4 lg:mt-6 text-center">
               <p className="text-gray-500 text-xs lg:text-sm">
                 {filteredCars.length} vehículo{filteredCars.length !== 1 ? 's' : ''} registrado{filteredCars.length !== 1 ? 's' : ''}
+                {' • '}
+                {filteredCars.filter(c => c.is_available).length} disponible{filteredCars.filter(c => c.is_available).length !== 1 ? 's' : ''}
               </p>
             </div>
           )}
