@@ -503,6 +503,17 @@ export type GetCarResponse = {
     modelName: string;
 };
 
+export type GetCarState = {
+    id: number;
+    VIN: string;
+    licensePlate: string;
+    modelId: number;
+    modelName: string;
+    is_available?: boolean;
+    atCheckIn?: boolean;
+    atWorkOrder?: boolean;
+};
+
 export type GetCarModelResponse = {
     id: number;
     modelName: string;
@@ -1099,6 +1110,22 @@ export type GetCarFullByPatentResponses = {
 };
 
 export type GetCarFullByPatentResponse = GetCarFullByPatentResponses[keyof GetCarFullByPatentResponses];
+
+export type GetAvailableCarsNoPendingRecordsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/car/available';
+};
+
+export type GetAvailableCarsNoPendingRecordsResponses = {
+    /**
+     * OK
+     */
+    200: Array<GetCarState>;
+};
+
+export type GetAvailableCarsNoPendingRecordsResponse = GetAvailableCarsNoPendingRecordsResponses[keyof GetAvailableCarsNoPendingRecordsResponses];
 
 export type GetCarModelData = {
     body?: never;
