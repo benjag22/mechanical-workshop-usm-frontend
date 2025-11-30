@@ -2,30 +2,19 @@ import {cn} from "@/app/cn";
 import {Check} from "lucide-react";
 import {useState, useEffect} from "react";
 import {ConditionState} from "@/app/check-in/components/ListOfConditionsByType";
-import {SingleMechanicalCondition} from "@/api";
+import {GroupedMechanicalCondition} from "@/api";
 
 type Props = {
-  condition: SingleMechanicalCondition;
-  onStateChange: (newState: ConditionState | null, conditionId: number) => void;
-  onSelectionStateChange: (conditionId: number, isIncluded: boolean, selectedState: string | null) => void;
+  condition: GroupedMechanicalCondition;
+  onStateChange: (newState: ConditionState | null, partName: string) => void;
+  onSelectionStateChange: (partName: string, isIncluded: boolean, selectedConditionId: number | null) => void;
   initialState: {
     isIncluded: boolean;
-    selectedState: string | null;
+    selectedConditionId: number | null;
   };
 }
 
-type State = "Rayado" | "Abollado" | "Trizado" | "Malo" | "Roto" | "Ausente";
-
-const CONDITIONS: State[] = [
-  "Rayado",
-  "Abollado",
-  "Trizado",
-  "Malo",
-  "Roto",
-  "Ausente"
-];
-
-const CONDITION_STYLES: Record<State, string> = {
+const CONDITION_STYLES: Record<string, string> = {
   "Rayado": "bg-emerald-400 text-black border-emerald-600 hover:bg-emerald-500",
   "Abollado": "bg-lime-300 text-black border-lime-500 hover:bg-lime-400",
   "Trizado": "bg-yellow-300 text-black border-yellow-500 hover:bg-yellow-400",
@@ -35,51 +24,51 @@ const CONDITION_STYLES: Record<State, string> = {
 };
 
 export default function SelectConditionComponent({condition, onStateChange, onSelectionStateChange, initialState}: Props) {
-  const [selectedState, setSelectedState] = useState<State | null>(initialState.selectedState as State | null);
+  const [selectedConditionId, setSelectedConditionId] = useState<number | null>(initialState.selectedConditionId);
   const [isIncluded, setIsIncluded] = useState<boolean>(initialState.isIncluded);
 
   useEffect(() => {
     setIsIncluded(initialState.isIncluded);
-    setSelectedState(initialState.selectedState as State | null);
+    setSelectedConditionId(initialState.selectedConditionId);
   }, [initialState]);
 
-  const handleStateSelect = (state: State) => {
-    if (!isIncluded) {
+  const handleConditionSelect = (conditionId: number, conditionState: string) => {
+    if (! isIncluded) {
       setIsIncluded(true);
     }
-    setSelectedState(state);
+    setSelectedConditionId(conditionId);
 
     onStateChange({
-      id: condition.id,
+      id: conditionId,
       partName: condition.partName,
-      conditionState: state
-    }, condition.id);
+      conditionState: conditionState
+    }, condition.partName);
 
-    onSelectionStateChange(condition.id, true, state);
+    onSelectionStateChange(condition.partName, true, conditionId);
   };
 
   const handleIncludeToggle = () => {
     const newIncluded = !isIncluded;
     setIsIncluded(newIncluded);
-    if (!newIncluded) {
-      setSelectedState(null);
-      onStateChange(null, condition.id);
-      onSelectionStateChange(condition.id, false, null);
+    if (! newIncluded) {
+      setSelectedConditionId(null);
+      onStateChange(null, condition.partName);
+      onSelectionStateChange(condition. partName, false, null);
     } else {
-      onSelectionStateChange(condition.id, true, selectedState);
+      onSelectionStateChange(condition.partName, true, selectedConditionId);
     }
   };
 
-  const getItemStyles = (state: State, index: number) => {
-    const baseStyles = "flex-1 cursor-pointer p-1 lg:p-2 md:p-3 h-12 flex items-center justify-center border-2 transition-all duration-300 ease-in-out font-medium text-xs lg:text-sm";
+  const getItemStyles = (conditionId: number, conditionState: string, index: number) => {
+    const baseStyles = "flex-1 cursor-pointer p-2 sm:p-3 h-12 sm:h-14 flex items-center justify-center border-2 transition-all duration-300 ease-in-out font-medium text-xs sm:text-sm";
 
     const positionStyles = cn(
       index === 0 ? "border-l-2" : "border-l-0"
     );
 
-    const stateStyles = CONDITION_STYLES[state];
+    const stateStyles = CONDITION_STYLES[conditionState] || "bg-gray-400 text-black border-gray-600 hover:bg-gray-500";
 
-    const selectedStyles = selectedState === state
+    const selectedStyles = selectedConditionId === conditionId
       ? "scale-105 shadow-lg ring-2 ring-black z-10"
       : "hover:scale-102 hover:shadow-md";
 
@@ -91,31 +80,31 @@ export default function SelectConditionComponent({condition, onStateChange, onSe
       <div
         onClick={handleIncludeToggle}
         className={cn(
-          "w-full flex items-center space-x-4 p-3 border-1 transition-all duration-200 cursor-pointer group",
+          "w-full flex items-center space-x-3 sm:space-x-4 p-3 sm:p-4 border-2 transition-all duration-200 cursor-pointer group",
           "border-gray-400 bg-gray-700 hover:bg-gray-600 hover:border-gray-300",
-          isIncluded ? "border-gray-300 bg-gray-600 rounded-t-lg" : "rounded-lg "
+          isIncluded ? "border-gray-300 bg-gray-600 rounded-t-lg" : "rounded-lg"
         )}
       >
-        <div className="relative">
+        <div className="relative flex-shrink-0">
           <input
             type="checkbox"
-            id={`checkbox-${condition.id}`}
+            id={`checkbox-${condition.partName}`}
             checked={isIncluded}
             onChange={() => {}}
             className="sr-only"
           />
           <div
             className={cn(
-              "w-5 h-5 rounded border-1 flex items-center justify-center transition-all duration-200",
+              "w-5 h-5 sm:w-6 sm:h-6 rounded border-2 flex items-center justify-center transition-all duration-200",
               isIncluded
                 ? "bg-blue-600 border-blue-600 shadow-sm"
-                : "bg-white border-gray-300 group-hover:border-green-800"
+                : "bg-white border-gray-300 group-hover:border-gray-100"
             )}
           >
             {isIncluded && (
               <Check
-                size={14}
-                className="text-white"
+                size={16}
+                className="text-white sm:w-4 sm:h-4"
                 strokeWidth={3}
               />
             )}
@@ -123,7 +112,7 @@ export default function SelectConditionComponent({condition, onStateChange, onSe
         </div>
         <label
           className={cn(
-            "font-medium cursor-pointer transition-all duration-200 select-none flex-1",
+            "font-medium cursor-pointer transition-all duration-200 select-none flex-1 text-sm sm:text-base",
             isIncluded
               ? "text-gray-100"
               : "text-gray-400 group-hover:text-gray-200"
@@ -131,11 +120,16 @@ export default function SelectConditionComponent({condition, onStateChange, onSe
         >
           {condition.partName}
         </label>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-shrink-0">
           <div className={cn(
-            "w-2 h-2 rounded-full transition-all duration-200",
-            isIncluded ? "bg-green-500" : "bg-gray-400"
+            "w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full transition-all duration-200",
+            isIncluded ? "bg-green-500 shadow-sm shadow-green-500/50" : "bg-gray-400"
           )}/>
+          {isIncluded && (
+            <span className="text-xs text-slate-400 hidden sm:inline">
+              {condition.conditions.length} estados
+            </span>
+          )}
         </div>
       </div>
 
@@ -143,26 +137,31 @@ export default function SelectConditionComponent({condition, onStateChange, onSe
         "w-full border-x-2 border-gray-200 rounded-b-lg overflow-hidden transition-all duration-200"
       )}>
         {isIncluded && (
-          <div className="flex w-full">
-            {CONDITIONS.map((state, index) => (
+          <div className="flex w-full flex-wrap sm:flex-nowrap">
+            {condition.conditions.map((singleCondition, index) => (
               <button
-                key={state}
+                key={singleCondition.id}
                 type="button"
-                className={cn(getItemStyles(state, index),
-                  selectedState === state ? "appearance-none" : ""
+                className={cn(
+                  getItemStyles(singleCondition. id, singleCondition.conditionState, index),
+                  selectedConditionId === singleCondition.id ?  "appearance-none" : "",
+                  "min-w-[33.333%] sm:min-w-0"
                 )}
                 onClick={(e) => {
                   e.stopPropagation();
-                  handleStateSelect(state);
+                  handleConditionSelect(singleCondition.id, singleCondition.conditionState);
                 }}
-                disabled={!isIncluded}
-                aria-pressed={selectedState === state}
-                aria-label={`Seleccionar estado ${state}`}
+                disabled={! isIncluded}
+                aria-pressed={selectedConditionId === singleCondition.id}
+                aria-label={`Seleccionar estado ${singleCondition.conditionState}`}
               >
-                {selectedState === state ? (
-                  <Check size={20} className="animate-in fade-in-50 zoom-in-95 duration-200"/>
+                {selectedConditionId === singleCondition.id ?  (
+                  <Check
+                    size={20}
+                    className="animate-in fade-in-50 zoom-in-95 duration-200 sm:w-5 sm:h-5"
+                  />
                 ) : (
-                  <span className="truncate">{state}</span>
+                  <span className="truncate px-1">{singleCondition.conditionState}</span>
                 )}
               </button>
             ))}

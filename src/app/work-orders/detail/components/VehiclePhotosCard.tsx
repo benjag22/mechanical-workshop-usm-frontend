@@ -82,11 +82,12 @@ export default function VehiclePhotosCard({photos}: { photos: GetImage[] }) {
         >
           <div className="relative max-w-4xl w-full aspect-video bg-gradient-to-br from-slate-700 to-slate-900 rounded-xl overflow-hidden">
             {selectedPhoto.url ? (
-              <Image
+              <img
                 src={selectedPhoto.url}
                 alt={selectedPhoto.alt}
                 className="w-full h-full object-cover"
               />
+
             ) : (
               <div className="absolute inset-0 flex flex-col items-center justify-center">
                 <Camera className="w-24 h-24 text-white/50 mb-4" />

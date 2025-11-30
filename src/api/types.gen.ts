@@ -369,9 +369,13 @@ export type GetWorkOrderHasDashboardLight = {
     isFunctional: boolean;
 };
 
+export type GroupedMechanicalCondition = {
+    partName: string;
+    conditions: Array<SingleMechanicalCondition>;
+};
+
 export type SingleMechanicalCondition = {
     id: number;
-    partName: string;
     conditionState: string;
 };
 
@@ -890,7 +894,12 @@ export type MarkWorkOrderAsCompletedResponse = MarkWorkOrderAsCompletedResponses
 export type GetAllWorkOrdersData = {
     body?: never;
     path?: never;
-    query?: never;
+    query?: {
+        /**
+         * Optional license plate filter. If omitted or empty, all work orders are returned.
+         */
+        licensePlate?: string;
+    };
     url: '/api/work-orders';
 };
 
@@ -954,7 +963,7 @@ export type GetInteriorConditionsResponses = {
     /**
      * OK
      */
-    200: Array<SingleMechanicalCondition>;
+    200: Array<GroupedMechanicalCondition>;
 };
 
 export type GetInteriorConditionsResponse = GetInteriorConditionsResponses[keyof GetInteriorConditionsResponses];
@@ -970,7 +979,7 @@ export type GetExteriorConditionsResponses = {
     /**
      * OK
      */
-    200: Array<SingleMechanicalCondition>;
+    200: Array<GroupedMechanicalCondition>;
 };
 
 export type GetExteriorConditionsResponse = GetExteriorConditionsResponses[keyof GetExteriorConditionsResponses];
@@ -986,7 +995,7 @@ export type GetElectricalConditionsResponses = {
     /**
      * OK
      */
-    200: Array<SingleMechanicalCondition>;
+    200: Array<GroupedMechanicalCondition>;
 };
 
 export type GetElectricalConditionsResponse = GetElectricalConditionsResponses[keyof GetElectricalConditionsResponses];

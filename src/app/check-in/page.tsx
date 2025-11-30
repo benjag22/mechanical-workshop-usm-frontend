@@ -39,7 +39,6 @@ export default function CheckInPage() {
   };
 
   const [checkInRequest, setCheckInRequest] = useState<CreateCheckInRequest>(initialCheckInRequest);
-
   const handleNewClientData = useCallback((clientData: CreateClientRequest) => {
     setCheckInRequest(prev =>
       produce(prev, (draft) => {

@@ -77,7 +77,7 @@ export default function ClientInfoDetailComponent({
   };
 
   const formatRut = (value: string) => {
-    const cleaned = value.replace(/[^0-9kK]/g, "").toUpperCase();
+    const cleaned = value.replace(/[^0-9kK]/g, ""). toUpperCase();
 
     if (cleaned.length === 0) return "";
 
@@ -99,7 +99,7 @@ export default function ClientInfoDetailComponent({
       cleaned = `+${cleaned}`;
     } else if (cleaned.startsWith("9")) {
       cleaned = `+56${cleaned}`;
-    } else if (!cleaned.startsWith("+569")) {
+    } else if (! cleaned.startsWith("+569")) {
       cleaned = `+569${cleaned}`;
     }
 
@@ -118,7 +118,7 @@ export default function ClientInfoDetailComponent({
   const filteredClients = existingClients.filter((client) => {
     const searchLower = searchTerm.toLowerCase();
     return (
-      client.firstName?.toLowerCase().includes(searchLower) ||
+      client. firstName?.toLowerCase().includes(searchLower) ||
       client.lastName?.toLowerCase().includes(searchLower) ||
       client.rut?.toLowerCase().includes(searchLower) ||
       client.emailAddress?.toLowerCase().includes(searchLower)
@@ -126,24 +126,24 @@ export default function ClientInfoDetailComponent({
   });
 
   return (
-    <div className="w-full h-full flex flex-col">
-      <div className="text-center mb-4 lg:mb-6">
-        <h2 className="text-xl lg:text-2xl font-bold text-white mb-1 lg:mb-2">
+    <div className="w-full h-full flex flex-col px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+      <div className="text-center mb-6 sm:mb-8">
+        <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-2 sm:mb-3">
           Información del Cliente
         </h2>
-        <p className="text-gray-400 text-sm lg:text-base">
+        <p className="text-gray-400 text-base sm:text-lg">
           Complete los datos del cliente para continuar
         </p>
       </div>
 
-      <div className="flex gap-2 mb-4 lg:mb-6">
+      <div className="flex gap-3 sm:gap-4 mb-6 sm:mb-8">
         <button
           onClick={() => handleModeChange("new")}
           className={cn(
-            "flex-1 py-2 lg:py-3 rounded-lg font-medium text-sm lg:text-base transition-all duration-200",
+            "flex-1 py-3 sm:py-4 rounded-xl font-semibold text-base sm:text-lg transition-all duration-200",
             mode === "new"
-              ? "bg-blue-600 text-white shadow-lg shadow-blue-500/50"
-              : "bg-gray-800/50 text-gray-400 hover:bg-gray-800 border border-gray-700/50"
+              ? "bg-blue-600 text-white shadow-lg shadow-blue-500/50 scale-105"
+              : "bg-gray-800/50 text-gray-400 hover:bg-gray-800 border border-gray-700/50 hover:scale-105"
           )}
         >
           Nuevo Cliente
@@ -151,31 +151,31 @@ export default function ClientInfoDetailComponent({
         <button
           onClick={() => handleModeChange("existing")}
           className={cn(
-            "flex-1 py-2 lg:py-3 rounded-lg font-medium text-sm lg:text-base transition-all duration-200",
+            "flex-1 py-3 sm:py-4 rounded-xl font-semibold text-base sm:text-lg transition-all duration-200",
             mode === "existing"
-              ? "bg-blue-600 text-white shadow-lg shadow-blue-500/50"
-              : "bg-gray-800/50 text-gray-400 hover:bg-gray-800 border border-gray-700/50"
+              ? "bg-blue-600 text-white shadow-lg shadow-blue-500/50 scale-105"
+              : "bg-gray-800/50 text-gray-400 hover:bg-gray-800 border border-gray-700/50 hover:scale-105"
           )}
         >
           Cliente Existente
         </button>
       </div>
 
-      <div className="flex-1 flex items-center overflow-auto">
+      <div className="flex-1 min-h-0">
         {mode === "new" ? (
-          <div className="w-full space-y-4 lg:space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
+          <div className="w-full space-y-5 sm:space-y-6 lg:space-y-7 pb-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6">
               <InputField
                 label="Nombre"
-                icon={<User className="w-3 h-3 lg:w-4 lg:h-4" />}
+                icon={<User className="w-5 h-5" />}
                 value={clientInfo.firstName}
                 onChange={(e) => handleInputChange("firstName", e.target.value)}
                 placeholder="Ingrese el nombre"
               />
               <InputField
                 label="Apellido"
-                icon={<User className="w-3 h-3 lg:w-4 lg:h-4" />}
-                value={clientInfo.lastName ?? ""}
+                icon={<User className="w-5 h-5" />}
+                value={clientInfo.lastName ??  ""}
                 onChange={(e) => handleInputChange("lastName", e.target.value)}
                 placeholder="Ingrese el apellido"
               />
@@ -183,17 +183,17 @@ export default function ClientInfoDetailComponent({
 
             <InputField
               label="RUT"
-              icon={<IdCard className="w-3 h-3 lg:w-4 lg:h-4" />}
+              icon={<IdCard className="w-5 h-5" />}
               value={clientInfo.rut}
               onChange={(e) => handleRutChange(e.target.value)}
               placeholder="12345678-9"
               maxLength={10}
             />
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6">
               <InputField
                 label="Correo Electrónico"
-                icon={<Mail className="w-3 h-3 lg:w-4 lg:h-4" />}
+                icon={<Mail className="w-5 h-5" />}
                 type="email"
                 value={clientInfo.emailAddress}
                 onChange={(e) => handleInputChange("emailAddress", e.target.value)}
@@ -201,7 +201,7 @@ export default function ClientInfoDetailComponent({
               />
               <InputField
                 label="Número de Teléfono"
-                icon={<Phone className="w-3 h-3 lg:w-4 lg:h-4" />}
+                icon={<Phone className="w-5 h-5" />}
                 type="tel"
                 value={clientInfo.cellphoneNumber}
                 onChange={(e) => handleCellphoneChange(e.target.value)}
@@ -210,30 +210,30 @@ export default function ClientInfoDetailComponent({
               />
             </div>
 
-            <div className="space-y-1 lg:space-y-2">
-              <label className="text-xs lg:text-sm font-medium text-gray-300 flex items-center gap-2">
-                <MapPin className="w-3 h-3 lg:w-4 lg:h-4" />
+            <div className="space-y-2 sm:space-y-3">
+              <label className="text-sm sm:text-base font-semibold text-gray-300 flex items-center gap-2">
+                <MapPin className="w-5 h-5" />
                 Dirección
               </label>
               <textarea
                 value={clientInfo.address}
                 onChange={(e) => handleInputChange("address", e.target.value)}
                 className={cn(
-                  "w-full px-3 lg:px-4 py-2 lg:py-3 bg-gray-800/50 border border-gray-700/50 rounded-lg",
-                  "text-white placeholder-gray-500 backdrop-blur-sm text-sm lg:text-base",
+                  "w-full px-4 sm:px-5 py-3 sm:py-4 bg-gray-800/50 border border-gray-700/50 rounded-xl",
+                  "text-white placeholder-gray-500 backdrop-blur-sm text-base sm:text-lg",
                   "focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50",
                   "transition-all duration-200 hover:border-gray-600/50",
-                  "resize-none h-16 lg:h-24"
+                  "resize-none h-28 sm:h-32"
                 )}
                 placeholder="Ingrese la dirección completa"
               />
             </div>
           </div>
         ) : (
-          <div className="w-full space-y-4">
-            <div className="space-y-1 lg:space-y-2">
-              <label className="text-xs lg:text-sm font-medium text-gray-300 flex items-center gap-2">
-                <Search className="w-3 h-3 lg:w-4 lg:h-4" />
+          <div className="w-full h-full flex flex-col space-y-4 sm:space-y-5">
+            <div className="flex-shrink-0 space-y-2 sm:space-y-3">
+              <label className="text-sm sm:text-base font-semibold text-gray-300 flex items-center gap-2">
+                <Search className="w-5 h-5" />
                 Buscar Cliente
               </label>
               <input
@@ -242,59 +242,67 @@ export default function ClientInfoDetailComponent({
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Buscar por nombre, apellido, RUT o email..."
                 className={cn(
-                  "w-full px-3 lg:px-4 py-2 lg:py-3 bg-gray-800/50 border border-gray-700/50 rounded-lg",
-                  "text-white placeholder-gray-500 backdrop-blur-sm text-sm lg:text-base",
+                  "w-full px-4 sm:px-5 py-3 sm:py-4 bg-gray-800/50 border border-gray-700/50 rounded-xl",
+                  "text-white placeholder-gray-500 backdrop-blur-sm text-base sm:text-lg",
                   "focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50",
                   "transition-all duration-200 hover:border-gray-600/50"
                 )}
               />
             </div>
 
-            <div className="space-y-2 max-h-96 overflow-y-auto pr-2">
-              {filteredClients.length === 0 ? (
-                <div className="text-center py-8 text-gray-400">
-                  No se encontraron clientes
+            <div className="flex-1 min-h-0 overflow-y-auto pr-1 sm:pr-2 space-y-3 sm:space-y-4 pb-4">
+              {filteredClients.length === 0 ?  (
+                <div className="flex flex-col items-center justify-center py-12 sm:py-16 text-gray-400">
+                  <Search className="w-12 h-12 sm:w-16 sm:h-16 mb-4 opacity-50" />
+                  <p className="text-base sm:text-lg font-medium">No se encontraron clientes</p>
+                  <p className="text-sm sm:text-base mt-2">Intenta con otro término de búsqueda</p>
                 </div>
               ) : (
-                filteredClients.map((client) => (
+                filteredClients. map((client) => (
                   <button
                     key={client.id}
-                    onClick={() => handleExistingClientSelect(client.id!)}
+                    onClick={() => handleExistingClientSelect(client.id! )}
                     className={cn(
-                      "w-full p-4 rounded-lg border transition-all duration-200 text-left",
+                      "w-full p-4 sm:p-5 rounded-xl border transition-all duration-200 text-left",
+                      "hover:scale-[1.02] active:scale-[0.98]",
                       selectedClientId === client.id
-                        ? "bg-blue-600/20 border-blue-500 shadow-lg shadow-blue-500/20"
+                        ? "bg-blue-600/20 border-blue-500 shadow-lg shadow-blue-500/20 ring-2 ring-blue-500/50"
                         : "bg-gray-800/50 border-gray-700/50 hover:bg-gray-800 hover:border-gray-600"
                     )}
                   >
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <div className="font-semibold text-white text-sm lg:text-base">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex-1 min-w-0">
+                        <div className="font-semibold text-white text-base sm:text-lg mb-2">
                           {client.firstName} {client.lastName}
                         </div>
-                        <div className="text-xs lg:text-sm text-gray-400 mt-1">
-                          RUT: {client.rut}
+                        <div className="space-y-1">
+                          <div className="text-sm sm:text-base text-gray-400 flex items-center gap-2">
+                            <IdCard className="w-4 h-4 flex-shrink-0" />
+                            <span className="truncate">RUT: {client.rut}</span>
+                          </div>
+                          {client.emailAddress && (
+                            <div className="text-sm sm:text-base text-gray-400 flex items-center gap-2">
+                              <Mail className="w-4 h-4 flex-shrink-0" />
+                              <span className="truncate">{client.emailAddress}</span>
+                            </div>
+                          )}
+                          {client.cellphoneNumber && (
+                            <div className="text-sm sm:text-base text-gray-400 flex items-center gap-2">
+                              <Phone className="w-4 h-4 flex-shrink-0" />
+                              <span>{client.cellphoneNumber}</span>
+                            </div>
+                          )}
                         </div>
-                        {client.emailAddress && (
-                          <div className="text-xs lg:text-sm text-gray-400 mt-1">
-                            {client.emailAddress}
-                          </div>
-                        )}
-                        {client.cellphoneNumber && (
-                          <div className="text-xs lg:text-sm text-gray-400 mt-1">
-                            {client.cellphoneNumber}
-                          </div>
-                        )}
                       </div>
                       {selectedClientId === client.id && (
-                        <div className="ml-2 flex-shrink-0">
-                          <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
+                        <div className="flex-shrink-0">
+                          <div className="w-6 h-6 sm:w-7 sm:h-7 bg-blue-500 rounded-full flex items-center justify-center shadow-lg">
                             <svg
-                              className="w-3 h-3 text-white"
+                              className="w-4 h-4 sm:w-5 sm:h-5 text-white"
                               fill="none"
                               strokeLinecap="round"
                               strokeLinejoin="round"
-                              strokeWidth="2"
+                              strokeWidth="3"
                               viewBox="0 0 24 24"
                               stroke="currentColor"
                             >
@@ -333,8 +341,8 @@ function InputField({
   maxLength?: number;
 }) {
   return (
-    <div className="space-y-1 lg:space-y-2">
-      <label className="text-xs lg:text-sm font-medium text-gray-300 flex items-center gap-2">
+    <div className="space-y-2 sm:space-y-3">
+      <label className="text-sm sm:text-base font-semibold text-gray-300 flex items-center gap-2">
         {icon}
         {label}
       </label>
@@ -345,10 +353,11 @@ function InputField({
         placeholder={placeholder}
         maxLength={maxLength}
         className={cn(
-          "w-full px-3 lg:px-4 py-2 lg:py-3 bg-gray-800/50 border border-gray-700/50 rounded-lg",
-          "text-white placeholder-gray-500 backdrop-blur-sm text-sm lg:text-base",
+          "w-full px-4 sm:px-5 py-3 sm:py-4 bg-gray-800/50 border border-gray-700/50 rounded-xl",
+          "text-white placeholder-gray-500 backdrop-blur-sm text-base sm:text-lg",
           "focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50",
-          "transition-all duration-200 hover:border-gray-600/50"
+          "transition-all duration-200 hover:border-gray-600/50",
+          "min-h-[48px] sm:min-h-[56px]"
         )}
       />
     </div>

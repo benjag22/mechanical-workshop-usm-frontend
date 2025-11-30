@@ -230,9 +230,7 @@ export const markWorkOrderAsCompleted = <ThrowOnError extends boolean = false>(o
 };
 
 /**
- * Get all work orders
- *
- * Returns a list of all work orders.
+ * Get all work orders with optional license plate filter
  */
 export const getAllWorkOrders = <ThrowOnError extends boolean = false>(options?: Options<GetAllWorkOrdersData, ThrowOnError>) => {
     return (options?.client ?? client).get<GetAllWorkOrdersResponses, unknown, ThrowOnError>({
